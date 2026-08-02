@@ -1,0 +1,28 @@
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# C++ Build Artefacts & IDEs
+*.o
+*.obj
+*.exe
+*.out
+*.so
+*.a
+*.lib
+*.dll
+build/
+bin/
+.vs/
+.vscode/
+cmake-build-*/
+out/
+
+# OS Specific
+.DS_Store
+Thumbs.db
