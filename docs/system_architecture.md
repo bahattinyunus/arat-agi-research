@@ -42,7 +42,34 @@ graph TD
 
 ---
 
-## 2. Bileşen Rolleri ve İletişim Protokolleri
+## 2. Bilişsel ve Fiziksel Veri Akış Şeması (Bilişsel Döngü)
+
+```text
+ +-------------------------------------------------------------------------------+
+ |                        BİLİŞSEL DÖNGÜ (PYTHON ASYNC)                          |
+ |                                                                               |
+ |   [Episodic Memory] <== (Sorgu & Geri Çağırma) ==> [Reasoning Engine]         |
+ |           ^                                                ||                 |
+ |           || (Deneyim Kaydı)                               || (Karar / Eylem) |
+ |           ||                                               \/                 |
+ |   [Working Memory] <============================== [Orchestrator]             |
+ +--------------------------------------------------------------------||---------+
+                                                                      || (Eylem)
+                                                                      \/
+ +-------------------------------------------------------------------------------+
+ |                        FİZİKSEL DÖNGÜ (C++ / CUDA)                            |
+ |                                                                               |
+ |   [Sensor Fusion (Kalman)] ==> (Durum Tahmini) ===> [Tensor Runtime]          |
+ |             ^                                              ||                 |
+ |             || (Sensör Verisi)                             || (Kontrol)       |
+ |             ||                                             \/                 |
+ |      [Sensör Girişleri] <========================== [Kinematic (PID)]         |
+ +-------------------------------------------------------------------------------+
+```
+
+---
+
+## 3. Bileşen Rolleri ve İletişim Protokolleri
 
 ### A. Yüksek Seviyeli Bilişsel Katman (Python)
 1.  **Reasoning Engine (Bilişsel Çıkarım Motoru):** Aktif çıkarım algoritmalarını çalıştırır. LLM girdilerini kullanarak dünya modelini günceller ve Variational Free Energy hesaplamalarını yapar.
@@ -60,7 +87,7 @@ graph TD
 
 ---
 
-## 3. Veri ve Kontrol Akışı (Epistemic-Action Loop)
+## 4. Veri ve Kontrol Akışı (Epistemic-Action Loop)
 
 1.  **Algı (Perception):** `Sensor Fusion` modülü fiziksel dünyadan verileri toplar ve durumu tahmin eder.
 2.  **Bellek Geri Çağırma (Memory Retrieval):** Durum tahmini `Episodic Memory`'e gönderilir ve benzer geçmiş deneyimler çekilir.

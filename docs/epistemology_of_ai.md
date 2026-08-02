@@ -6,23 +6,51 @@ Bu çalışma, **Arat AGI Research** kapsamında geliştirilen bilişsel sisteml
 
 ---
 
-## 1. Bilgi Teorisi ve Zekanın Doğası
+## 1. Bilgi Teorisi, Entropi ve Zekanın Doğası
 
-Claude Shannon'ın bilgi teorisinden bu yana biliyoruz ki, bilgi (information) belirsizliğin giderilmesidir. Ancak zeki bir ajan için bilgi, yalnızca pasif bir şekilde alınan bit dizilerinden ibaret değildir. Zeka, bilgi akışına anlam kazandıran ve çevreye yönelik tahminleri güncelleyen dinamik bir süreçtir.
+Claude Shannon'ın bilgi teorisinden bu yana biliyoruz ki, bilgi (information) belirsizliğin giderilmesidir. 
+
+> *"Bilgi, belirsizliği azaltan şeydir. Bir mesajın bilgi içeriği, onun alıcı için taşıdığı sürpriz değeri ile doğru orantılıdır."* — **Claude Shannon**
+
+Ancak zeki bir ajan için bilgi, yalnızca pasif bir şekilde alınan bit dizilerinden ibaret değildir. Zeka, bilgi akışına anlam kazandıran ve çevreye yönelik tahminleri güncelleyen dinamik bir süreçtir.
 
 Zekanın epistemolojisi şu soruyla başlar: *Bir sistem, kendi fiziksel sınırlarının ötesindeki bir dünya hakkında nasıl bilgi sahibi olabilir?*
 
-Bu soru bizi Immanuel Kant'ın "kendinde şey" (noumenon) kavramına ve oradan modern sibernetik ve fizik teorilerine götürür. Ajan doğrudan dünyayı algılayamaz; yalnızca duyusal alıcıları (sensory receptors) üzerindeki etkileri gözlemleyebilir. Bu nedenle ajan, dış dünyanın durumlarına ilişkin sürekli güncellenen bir **dünya modeli** (generative model) barındırmak zorundadır.
+> *"Deneyimsiz hiçbir bilgi bilgi değildir; tüm bilgilerimiz deneyimle başlar ama deneyimden doğmaz."* — **Immanuel Kant** (Saf Aklın Eleştirisi)
+
+Ajan doğrudan dünyayı algılayamaz; yalnızca duyusal alıcıları (sensory receptors) üzerindeki etkileri gözlemleyebilir. Bu nedenle ajan, dış dünyanın durumlarına ilişkin sürekli güncellenen bir **dünya modeli** (generative model) barındırmak zorundadır.
 
 ---
 
-## 2. Serbest Enerji Prensibi (Free Energy Principle)
+## 2. Markov Battaniyesi (Markov Blanket) ve Bilişsel Sınırlar
+
+Karl Friston'ın yaklaşımında, bir sistemi dış dünyadan ayıran istatistiksel sınır **Markov Battaniyesi** (Markov Blanket) olarak adlandırılır. Bir ajanın içsel durumları ($\mathbf{z}$), dışsal durumlardan ($\mathbf{\psi}$) doğrudan etkilenmez. Aralarındaki iletişim Markov battaniyesini oluşturan iki katman üzerinden gerçekleşir:
+
+*   **Duyusal Durumlar (Sensory States - $\mathbf{s}$):** Dış dünyadan iç dünyaya bilgi taşıyan pasif alıcılar.
+*   **Aktif Durumlar (Active States - $\mathbf{a}$):** İç dünyadan dış dünyaya etki eden eylem mekanizmaları.
+
+```text
+  [ Dışsal Durumlar (ψ) ]  <--->  [ Duyusal Durumlar (s) ]  ---> [ İçsel Durumlar (z) ]
+           ^                                                               |
+           |                                                               v
+           +--------------------  [ Aktif Durumlar (a) ]  <----------------+
+```
+
+Ajanın amacı, Markov battaniyesinin arkasından dış dünyaya dair inançlarını korumak ve optimize etmektir.
+
+---
+
+## 3. Serbest Enerji Prensibi (Free Energy Principle)
 
 Karl Friston tarafından ortaya konan Serbest Enerji Prensibi (FEP), yaşayan ve varlığını sürdüren tüm fiziksel/biyolojik sistemlerin çevrelerindeki düzensizliğe (entropiye) karşı koymak için "sürprizi" (surprise) minimize etmek zorunda olduğunu savunur.
+
+> *"Bir sistemin varlığını sürdürebilmesi, onun çevreyle arasındaki istatistiksel sınırda serbest enerjiyi minimize etmesine bağlıdır."* — **Karl Friston**
 
 Matematiksel olarak sürpriz, ajanın dünya modeli göz önüne alındığında duyusal girdilerin negatif log-olasılığıdır: $-\log p(\mathbf{x})$. Ancak bu değerin doğrudan hesaplanması (entegrasyon zorluğu nedeniyle) intractable (hesaplanamaz) düzeydedir. Bu yüzden biyolojik ve yapay zeki sistemler, üst sınır olan **Varyasyonel Serbest Enerji (F)** değerini minimize ederler:
 
 $$ F = D_{KL}(q(\mathbf{z}) \parallel p(\mathbf{z})) - \mathbb{E}_{q(\mathbf{z})}[\log p(\mathbf{x} \mid \mathbf{z})] $$
+
+$$ F = \int q(\mathbf{z}) \log \frac{q(\mathbf{z})}{p(\mathbf{x}, \mathbf{z})} d\mathbf{z} $$
 
 Burada:
 *   $\mathbf{x}$ ajanın duyusal girdilerini (sensory observations),
@@ -36,7 +64,7 @@ Serbest enerji minimizasyonu iki şekilde gerçekleşebilir:
 
 ---
 
-## 3. Aktif Çıkarım ve Eylemin Epistemolojisi
+## 4. Aktif Çıkarım ve Eylemin Epistemolojisi
 
 Geleneksel pekiştirmeli öğrenmede (reinforcement learning) ajan, bir ödül fonksiyonunu maksimize etmeye çalışır. Aktif çıkarımda ise ödül ve ceza gibi kavramlar ayrı birer fonksiyon değildir; onlar da modelin birer parçasıdır. Ajan, tercih ettiği durumları yüksek olasılıklı olarak tanımlar. Örneğin, bir robot için "şarjının bitmesi" düşük olasılıklı (yüksek sürprizli) bir durumdur. Dolayısıyla aktif çıkarım yapan ajan, sürprizi minimize etmek için otomatik olarak şarj istasyonuna yönelecektir.
 
@@ -52,9 +80,11 @@ Aktif çıkarım, keşif (exploration) ile sömürü (exploitation) arasındaki 
 
 ---
 
-## 4. Sınırlı Rasyonellik ve Uç Cihazların Epistemolojisi
+## 5. Sınırlı Rasyonellik ve Uç Cihazların Epistemolojisi
 
 Bir AGI ajanı sonsuz hesaplama gücüne sahip değildir. Özellikle Edge AI (uç yapay zeka) sistemlerinde bellek ve işlemci kısıtları, serbest enerjinin hesaplanma hassasiyetini sınırlar. Bu durum, Herbert Simon'ın **Sınırlı Rasyonellik** (Bounded Rationality) teziyle örtüşür.
+
+> *"Ajanların çevrelerindeki karmaşıklığı tam olarak hesaplayacak güçleri yoktur. Bu yüzden optimal kararlar yerine, kendi fiziksel kısıtlarına uygun 'yeterince iyi' (satisficing) kararları alırlar."* — **Herbert Simon**
 
 Arat'ın bilişsel mimarisi, bu kısıtı bir zafiyet değil, tasarım parametresi olarak kabul eder. C++ tabanlı düşük seviyeli bellek yöneticilerimiz ve optimize edilmiş çıkarım motorlarımız, varyasyonel çıkarımın işlem yükünü minimize ederek ajanın milisaniyeler seviyesinde eylem kararı alabilmesini sağlar. Epistemik derinlik, donanım kaynaklarının verimli kullanımıyla dengelenir.
 

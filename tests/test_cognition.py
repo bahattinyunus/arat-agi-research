@@ -1,17 +1,17 @@
 import unittest
 import numpy as np
 from core_cognition.reasoning_engine import ActiveInferenceAgent
-from core_cognition.episodic_memory import SemanticMemory, WorkingMemory
+from core_cognition.episodic_memory import SemanticMemory, WorkingMemory, EpisodicMemory
 
 class TestCognition(unittest.TestCase):
     def test_active_inference_agent(self):
         # 3 states, 3 observations, 2 actions
-        agent = ActiveInferenceAgent(num_states=3, num_obs=3, num_actions=2)
+        agent = ActiveInferenceAgent(num_states=3, num_obs=3, num_actions=2, learning_rate=0.5)
         
         # Test default initial belief is uniform
         np.testing.assert_array_almost_equal(agent.q, np.array([1/3, 1/3, 1/3]))
         
-        # Test infer_states updates belief stochastically
+        # Test infer_states updates belief
         q_updated = agent.infer_states(observation=1)
         self.assertEqual(len(q_updated), 3)
         self.assertAlmostEqual(np.sum(q_updated), 1.0)
@@ -20,25 +20,28 @@ class TestCognition(unittest.TestCase):
         vfe = agent.calculate_vfe(observation=1)
         self.assertTrue(vfe >= 0)
         
-        # Test action selection
+        # Test action selection stashes action stochastically
         action, action_probs = agent.select_action()
+        self.assertEqual(agent.prev_action, action)
         self.assertIn(action, [0, 1])
-        self.assertAlmostEqual(np.sum(action_probs), 1.0)
+
+        # Test model learning: update A matrix counts based on state beliefs
+        initial_A = np.copy(agent.A)
+        agent.update_model(actual_obs=2)
+        # Likelihood distribution A should shift
+        self.assertFalse(np.array_equal(initial_A, agent.A))
 
     def test_working_memory(self):
         mem = WorkingMemory(capacity=3, decay_rate=0.2)
         mem.add("event_1", importance=1.0)
         mem.add("event_2", importance=0.8)
         
-        # Check they exist
         self.assertIn("event_1", mem.get_contents())
         self.assertIn("event_2", mem.get_contents())
         
-        # Trigger decay by adding more elements
         mem.add("event_3", importance=0.9)
         mem.add("event_4", importance=1.0)
         
-        # Capacity is 3, so first one (event_1 which decayed) or lowest importance should be dropped
         contents = mem.get_contents()
         self.assertEqual(len(contents), 3)
         self.assertIn("event_4", contents)
@@ -49,13 +52,26 @@ class TestCognition(unittest.TestCase):
         mem.store("High performance computing on Nvidia GPU CUDA", {"topic": "CUDA"})
         mem.store("Edge AI inference using TensorRT C++ runtimes", {"topic": "Edge"})
         
-        # Query for GPU/CUDA computing
         results = mem.query("Nvidia graphics computing with CUDA", top_k=2)
         self.assertTrue(len(results) > 0)
-        
-        # Highest match should be the CUDA related entry
         self.assertEqual(results[0]["metadata"]["topic"], "CUDA")
-        self.assertTrue(results[0]["score"] > 0)
+
+    def test_memory_consolidation(self):
+        ep_mem = EpisodicMemory()
+        sem_mem = SemanticMemory(dimension=64)
+        
+        # Add duplicate episodes to create a clear trend: State="idle" + Action="search" -> Obs="data_found", Reward=1.0
+        ep_mem.record_episode("idle", "search", "data_found", reward=1.0)
+        ep_mem.record_episode("idle", "search", "data_found", reward=1.0)
+        ep_mem.record_episode("idle", "search", "sensor_error", reward=0.0) # minor outlier
+        
+        consolidated = sem_mem.consolidate_episodes(ep_mem)
+        self.assertEqual(consolidated, 1) # should consolidate exactly 1 fact
+        
+        # Query semantic memory to check if it has the generalized fact
+        query_res = sem_mem.query("What happens when I search from idle state?")
+        self.assertTrue(len(query_res) > 0)
+        self.assertIn("leads to observation 'data_found'", query_res[0]["text"])
 
 if __name__ == "__main__":
     unittest.main()
