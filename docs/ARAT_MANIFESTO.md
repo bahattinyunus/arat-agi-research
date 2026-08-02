@@ -1,5 +1,7 @@
 # ARAT AGI Manifestosu: Kurumsal Yapay Zeka Ahlakı ve Mühendislik Prensipleri
 
+![Arat Emblem](../assets/arat_emblem.jpg)
+
 > *"Yaratamadığım şeyi anlayamam."* — **Richard Feynman**
 >
 > *"Zeka, evrenin kendisini anlamlandırma biçimidir. Bizim görevimiz bu süreci hızlandırmaktır."* — **David Deutsch**

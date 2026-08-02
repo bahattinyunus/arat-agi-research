@@ -1,5 +1,7 @@
 # Arat OMEGA/AGI Sistem Mimarisi
 
+![Arat Emblem](../assets/arat_emblem.jpg)
+
 Bu belge, Arat AGI ekosisteminin çekirdek mimari yapısı olan **OMEGA/AGI** mimarisini ve bileşenler arası veri/kontrol akışlarını tanımlar.
 
 ---
