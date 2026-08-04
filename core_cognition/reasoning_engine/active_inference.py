@@ -144,3 +144,66 @@ class ActiveInferenceAgent:
         # Store for learning in next step
         self.prev_action = selected_action
         return selected_action, action_probs
+
+
+class HierarchicalActiveInferenceAgent:
+    """
+    Hierarchical Active Inference Agent with two levels based on Friston's formulation:
+    - High-level (Goal/Context layer)
+    - Low-level (Reactive/Action layer)
+    The high-level agent infers abstract states and selects abstract goal actions.
+    These goal actions set the prior preference (C) vector for the low-level agent.
+    """
+    def __init__(self, high_params, low_params, goal_to_preference_matrix):
+        """
+        high_params: dict with keys (num_states, num_obs, num_actions) and optionally learning_rate
+        low_params: dict with keys (num_states, num_obs, num_actions) and optionally learning_rate
+        goal_to_preference_matrix: numpy array of shape (high_num_actions, low_num_obs)
+            Maps high-level selected goal actions to preferred observations for the low level.
+        """
+        self.high_agent = ActiveInferenceAgent(
+            high_params["num_states"], 
+            high_params["num_obs"], 
+            high_params["num_actions"],
+            learning_rate=high_params.get("learning_rate", 0.1)
+        )
+        self.low_agent = ActiveInferenceAgent(
+            low_params["num_states"], 
+            low_params["num_obs"], 
+            low_params["num_actions"],
+            learning_rate=low_params.get("learning_rate", 0.1)
+        )
+        self.goal_to_pref = np.array(goal_to_preference_matrix)
+
+    def run_step(self, high_obs, low_obs):
+        """
+        Runs one step of hierarchical inference:
+        1. High-level agent infers high-level state from high_obs
+        2. High-level agent selects high-level goal action
+        3. Low-level agent's C matrix (preferences) is set based on the selected goal action
+        4. Low-level agent infers state from low_obs
+        5. Low-level agent selects low-level action
+        """
+        # High level inference and action selection
+        self.high_agent.infer_states(high_obs)
+        high_action, high_action_probs = self.high_agent.select_action()
+        self.high_agent.update_model(high_obs)
+
+        # Update low level preferences (C matrix)
+        preferred_obs_dist = self.goal_to_pref[high_action]
+        self.low_agent.set_matrices(C=preferred_obs_dist)
+
+        # Low level inference and action selection
+        self.low_agent.infer_states(low_obs)
+        low_action, low_action_probs = self.low_agent.select_action()
+        self.low_agent.update_model(low_obs)
+
+        return {
+            "high_action": high_action,
+            "high_action_probs": high_action_probs,
+            "low_action": low_action,
+            "low_action_probs": low_action_probs,
+            "high_belief": self.high_agent.q,
+            "low_belief": self.low_agent.q
+        }
+

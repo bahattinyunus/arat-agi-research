@@ -3,9 +3,9 @@
 ![Arat Emblem](../assets/arat_emblem.jpg)
 
 > *"Yaratamadığım şeyi anlayamam."* — **Richard Feynman**
->
-> *"Zeka, evrenin kendisini anlamlandırma biçimidir. Bizim görevimiz bu süreci hızlandırmaktır."* — **David Deutsch**
->
+
+> *"Zeka, evrenin kendisini anlamlandırma biçimidir. Bizim görevimiz bu süreci hızlandırmaktır."* — **David Deutsch** (The Beginning of Infinity)
+
 > *"Bir sistemin kalitesi, onu oluşturan parçaların kalitesinden ziyade, bu parçaların birbiriyle nasıl etkileşime girdiğine bağlıdır."* — **Norbert Wiener** (Sibernetiğin Kurucusu)
 
 Bu manifesto, **Arat Enterprise** bünyesinde yürütülen Yapay Genel Zeka (AGI) çalışmalarının ahlaki sınırlarını, tasarım prensiplerini ve mühendislik metodolojilerini tanımlar. Arat bünyesinde geliştirilen her algoritma, satır kod ve fiziksel sistem bu belgedeki ilkelere tabidir.
@@ -16,10 +16,12 @@ Bu manifesto, **Arat Enterprise** bünyesinde yürütülen Yapay Genel Zeka (AGI
 
 Mevcut yapay zeka paradigması, veriyi pasif bir şekilde gözlemleyen ve bu veriden istatistiksel olasılık dağılımları çıkaran modeller üzerine kuruludur. Arat olarak biz zekanın, çevreyle aktif bir etkileşim içinde olması gerektiğine inanıyoruz (Active Inference).
 
-> *"Makineler düşünebilir mi? Bu soruyu cevaplamak için, 'makine' ve 'düşünmek' kelimelerinin anlamlarını dikkatlice tanımlamamız gerekir."* — **Alan Turing**
+> *"Makineler düşünebilir mi? Bu soruyu cevaplamak için, 'makine' ve 'düşünmek' kelimelerinin anlamlarını dikkatlice tanımlamamız gerekir."* — **Alan Turing** (Computing Machinery and Intelligence)
 
 *   **Zeka Epistemiği:** Zeka, sadece bilgiyi depolamak değil, o bilginin doğruluğunu, sınırlarını ve çevre üzerindeki etkilerini aktif olarak test etmektir.
 *   **Embodied AI (Bedenlenmiş Zeka):** Bir sistemin fiziksel veya simüle edilmiş bir dünyada eylem alabilme ve bu eylemlerin sonuçlarından öğrenme yeteneği yoksa, o sistemin "genel zeka" düzeyine ulaşması mümkün değildir.
+
+> *"Hayatın şu anki en üzücü yönü, bilimin bilgiyi toplumun bilgelik toplamasından daha hızlı toplamasıdır."* — **Isaac Asimov** (İnsanlığın Geleceği Üzerine)
 
 ---
 
@@ -27,7 +29,7 @@ Mevcut yapay zeka paradigması, veriyi pasif bir şekilde gözlemleyen ve bu ver
 
 Trilyonlarca parametreli monolitik modeller, aşırı donanım bağımlılığı yaratır ve tek bir hata noktasında tüm sistemi kararsızlaştırır. Arat'ın mimari vizyonu **Synthetic Nous** (Sentetik Zihin) ve klasik sibernetik prensipler üzerine kuruludur:
 
-> *"Yalnızca çeşitlilik, çeşitliliği yok edebilir (Only variety can destroy variety)."* — **W. Ross Ashby** (Ashby Yasası)
+> *"Yalnızca çeşitlilik, çeşitliliği yok edebilir (Only variety can destroy variety)."* — **W. Ross Ashby** (Ashby Yasası / Gereksinim Çeşitliliği Yasası)
 
 1.  **Uzmanlaşmış Ajanlar:** Tek bir devasa model yerine, her biri belirli bilişsel görevlerde (mantık yürütme, hafıza geri çağırma, algısal işleme, motor kontrol) uzmanlaşmış küçük, çevik ve optimize edilmiş ajanlar.
 2.  **Epistemic Consensus (Epistemik Görüş Birliği):** Ajanlar, karar alma süreçlerinde birbirleriyle asenkron protokoller üzerinden haberleşir, kendi belirsizlik (uncertainty) seviyelerini paylaşır ve ortak bir dünya modeli üzerinde uzlaşır.
@@ -37,15 +39,21 @@ Trilyonlarca parametreli monolitik modeller, aşırı donanım bağımlılığı
 
 ---
 
-## 3. Güvenli Yapay Zeka Tasarımı (Safety-by-Design)
+## 3. Güvenli Yapay Zeka Tasarımı (Safety-by-Design) ve Epistemik Güvenlik
 
 Yapay Genel Zeka araştırmalarında güvenlik, geliştirme bittikten sonra eklenen bir filtre veya yama olamaz. Güvenlik, sistemin çekirdeğinde yer almalıdır:
 
-> *"Canlılar ve otomatlar arasındaki benzerlikleri incelerken, her ikisinin de çevreden bilgi alan, bu bilgiyi işleyen ve çevreye etki eden geri beslemeli (feedback) sistemler olduğunu görürüz."* — **John von Neumann**
+> *"Canlılar ve otomatlar arasındaki benzerlikleri incelerken, her ikisinin de çevreden bilgi alan, bu bilgiyi işleyen ve çevreye etki eden geri beslemeli (feedback) sistemler olduğunu görürüz. Bu sistemlerin kontrolden çıkması katastrofik sonuçlar doğurabilir."* — **John von Neumann** (Theory of Self-Reproducing Automata)
 
 *   **Free Energy Sınırlandırılması:** Ajanların çevrelerinde yaratabileceği maksimum entropi ve sistemin kendi serbest enerjisi matematiksel sınırlarla kontrol altında tutulur. Ajanın kendi kararlılığı (homeostazi) dışındaki kararsız durumlara girmesi engellenir.
 *   **İnsan-Denetimli Aktif Öğrenme (Human-in-the-Loop):** Kritik kararlarda ve yüksek belirsizlik durumlarında ajan, eylem almak yerine denetleyiciye (insan veya üst orkestratör) danışmak ve epistemic arama yapmak zorundadır.
-*   **Açık Kaynak ve Bilimsel Şeffaflık:** Yapay zekanın kapalı kapılar ardında değil, açık bilim standartlarında geliştirilmesi gerektiğine inanyoruz. Kod tabanımız ve felsefemiz araştırmacıların denetimine açıktır.
+*   **Açık Kaynak ve Bilimsel Şeffaflık:** Yapay zekanın kapalı kapılar ardında değil, açık bilim standartlarında geliştirilmesi gerektiğine inanıyoruz. Kod tabanımız ve felsefemiz araştırmacıların denetimine açıktır.
+
+> *"Yapay zeka alanında başarı, insanlık tarihinin en büyük olayı olacaktır. Ne yazık ki risklerden kaçınmayı öğrenemezsek, bu aynı zamanda son olay da olabilir."* — **Stephen Hawking** (The Future of Intelligence)
+
+> *"Bir zeka patlaması beklentisi karşısında biz insanlar, ellerinde bir bomba ile oynayan küçük çocuklar gibiyiz."* — **Nick Bostrom** (Superintelligence: Paths, Dangers, Strategies)
+
+> *"Bilim ve teknolojinin egemen olduğu bir toplumu, neredeyse hiç kimsenin bilim ve teknolojiyi anlamadığı bir şekilde düzenledik. Bu durum felaketin reçetesidir."* — **Carl Sagan** (Demon-Haunted World)
 
 ---
 

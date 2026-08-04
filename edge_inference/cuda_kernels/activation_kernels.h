@@ -16,8 +16,16 @@ bool launch_swiglu_kernel(const float* input_x, const float* input_y, float* out
 // CPU fallback implementation for testing/debugging.
 void swiglu_cpu_fallback(const float* input_x, const float* input_y, float* output, size_t N, float beta = 1.0f);
 
+// Launches the custom GELU activation kernel on GPU.
+// GELU(x) = 0.5 * x * (1 + tanh(sqrt(2 / pi) * (x + 0.044715 * x^3)))
+bool launch_gelu_kernel(const float* input, float* output, size_t N);
+
+// CPU fallback implementation for testing/debugging.
+void gelu_cpu_fallback(const float* input, float* output, size_t N);
+
 } // namespace cuda
 } // namespace edge
 } // namespace arat
+
 
 #endif // ACTIVATION_KERNELS_H

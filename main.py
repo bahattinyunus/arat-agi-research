@@ -2,10 +2,10 @@ import asyncio
 import numpy as np
 import time
 import logging
-from core_cognition.reasoning_engine import ActiveInferenceAgent
+from core_cognition.reasoning_engine import ActiveInferenceAgent, HierarchicalActiveInferenceAgent
 from core_cognition.episodic_memory import SemanticMemory, EpisodicMemory, WorkingMemory
 from core_cognition.agent_orchestration import EpistemicMessageBroker, EpistemicMessage
-from autonomous_control.sensor_fusion import SensorFusionNode
+from autonomous_control.sensor_fusion import SensorFusionNode, EKFSensorFusionNode
 from autonomous_control.kinematic_loops import PIDController, DifferentialDriveKinematics
 
 # Set up logging formatting
@@ -18,6 +18,7 @@ logger = logging.getLogger("OMEGA-AGI-Simulation")
 async def main():
     logger.info("==================================================")
     logger.info("Initializing ARAT OMEGA/AGI Integrated Simulation")
+    logger.info("Featuring Hierarchical Active Inference & EKF Fusion")
     logger.info("==================================================")
 
     # ==========================================
@@ -30,143 +31,188 @@ async def main():
     
     # Store initial knowledge in Semantic Memory
     semantic_mem.store("ARAT Technology & Systems specializes in embedded Edge AI runtimes.", {"source": "init"})
-    semantic_mem.store("Active Inference agents minimize free energy to resolve uncertainty.", {"source": "init"})
-    semantic_mem.store("Extended Kalman Filters fuse high-frequency IMU and LiDAR data.", {"source": "init"})
+    semantic_mem.store("Hierarchical Active Inference operates at goal and motor scales.", {"source": "init"})
+    semantic_mem.store("Extended Kalman Filters fuse non-linear velocity and odometry.", {"source": "init"})
     
-    # Active Inference Agent (3 states, 3 observations, 3 actions)
-    # States: 0 = Safe, 1 = Caution, 2 = Danger
-    # Observations: 0 = ClearPath, 1 = ObstacleDetected, 2 = CollisionImminent
-    # Actions: 0 = MoveForward, 1 = SlowDown, 2 = EmergencyBrake
-    states = ["Safe", "Caution", "Danger"]
-    observations = ["ClearPath", "ObstacleDetected", "CollisionImminent"]
-    actions = ["MoveForward", "SlowDown", "EmergencyBrake"]
+    # Set up Hierarchical Active Inference Agent
+    # High-level params (Goal level)
+    high_states = ["Goal_Advance", "Goal_Recon", "Goal_SafeState"]
+    high_observations = ["NoThreat", "LiDAR_Anomaly", "LowPower"]
+    high_actions = ["ExecuteAdvance", "ExecuteRecon", "ExecuteSafety"]
     
-    agent = ActiveInferenceAgent(num_states=3, num_obs=3, num_actions=3, learning_rate=0.15)
+    high_params = {
+        "num_states": len(high_states),
+        "num_obs": len(high_observations),
+        "num_actions": len(high_actions),
+        "learning_rate": 0.1
+    }
     
-    # Prior state preferences: strong preference for ClearPath (obs 0), aversion to CollisionImminent (obs 2)
-    agent.set_matrices(C=np.array([0.9, 0.09, 0.01]))
+    # Low-level params (Reactive control level)
+    low_states = ["MovingForward", "SlowingDown", "EmergencyStopped"]
+    low_observations = ["ClearPath", "ObstacleDetected", "CollisionImminent"]
+    low_actions = ["ApplyAcceleration", "ApplyBrake", "ApplyFullStop"]
+    
+    low_params = {
+        "num_states": len(low_states),
+        "num_obs": len(low_observations),
+        "num_actions": len(low_actions),
+        "learning_rate": 0.2
+    }
+    
+    # Goal to preference mapping matrix (high_actions x low_obs)
+    # High-level goal actions set the prior preference C of the low level agent
+    goal_to_preference_matrix = np.array([
+        [0.90, 0.09, 0.01],  # ExecuteAdvance: strongly prefers ClearPath
+        [0.20, 0.70, 0.10],  # ExecuteRecon: prefers ObstacleDetected to investigate
+        [0.01, 0.09, 0.90]   # ExecuteSafety: strongly prefers CollisionImminent to stop/caution
+    ])
+    
+    hierarchical_agent = HierarchicalActiveInferenceAgent(
+        high_params,
+        low_params,
+        goal_to_preference_matrix
+    )
+
+    # Set prior state matrices for high agent
+    hierarchical_agent.high_agent.set_matrices(
+        C=np.array([0.8, 0.15, 0.05]), # Prior preferences for high level observations
+        D=np.array([0.7, 0.2, 0.1])    # Prior belief about initial goal states
+    )
     
     # ==========================================
     # 2. ORKESTRASYON VE HABERLEŞME (Orchestration)
     # ==========================================
     broker = EpistemicMessageBroker()
     
-    # Simulate multi-agent belief fusion
     logger.info("[Orchestrator] Fusing beliefs from disparate specialist agents...")
-    agent_a_belief = np.array([0.7, 0.2, 0.1]) # Navigation specialist: highly confident safe
-    agent_b_belief = np.array([0.5, 0.4, 0.1]) # LiDAR specialist: moderate caution
-    agent_c_belief = np.array([0.1, 0.8, 0.1]) # Safety monitor: sees danger/caution
-    
+    agent_a_belief = np.array([0.7, 0.2, 0.1])
+    agent_b_belief = np.array([0.5, 0.4, 0.1])
+    agent_c_belief = np.array([0.1, 0.8, 0.1])
     beliefs = [agent_a_belief, agent_b_belief, agent_c_belief]
-    confidences = [0.9, 0.8, 0.4] # Navigation is highly trusted
+    confidences = [0.9, 0.8, 0.4]
     
     linear_fused = broker.fuse_beliefs(beliefs, confidences)
     log_linear_fused = broker.fuse_beliefs_log_linear(beliefs, confidences)
     
-    logger.info(f"[Orchestrator] Linear Opinion Pool (Mixture): {linear_fused.round(3).tolist()}")
-    logger.info(f"[Orchestrator] Log-Linear Pool (Product of Experts): {log_linear_fused.round(3).tolist()}")
+    logger.info(f"[Orchestrator] Linear Fused (Consensus): {linear_fused.round(3).tolist()}")
+    logger.info(f"[Orchestrator] Log-Linear Fused (Expert Product): {log_linear_fused.round(3).tolist()}")
 
     # ==========================================
-    # 3. KONTROL VE FÜZYON DÖNGÜSÜ (Control & Fusion)
+    # 3. NON-LINEAR SENSOR FUSION & ROBOTICS
     # ==========================================
-    # Sensor Fusion Node (Kalman Filter)
     dt = 0.1
-    fusion_node = SensorFusionNode(dt=dt)
+    # Non-linear EKF Node
+    ekf_node = EKFSensorFusionNode(dt=dt, initial_pose=(0.0, 0.0, 0.0))
     
-    # PID controller for velocity (Kp=1.8, Ki=0.4, Kd=0.1, Kff=1.0)
-    pid = PIDController(kp=1.8, ki=0.4, kd=0.1, kff=1.0, output_min=-10.0, output_max=10.0)
+    # PID controller for linear velocity
+    pid = PIDController(kp=2.0, ki=0.5, kd=0.1, kff=1.0, output_min=-5.0, output_max=5.0)
     
     # Differential Drive Kinematics
-    kinematics = DifferentialDriveKinematics(wheel_radius=0.08, wheel_base=0.4)
+    kinematics = DifferentialDriveKinematics(wheel_radius=0.08, wheel_base=0.4, initial_pose=(0.0, 0.0, 0.0))
 
     logger.info("==================================================")
-    logger.info("Running Real-Time Physics and Control Simulation")
+    logger.info("Running Real-Time Non-Linear Physics & Hierarchical Control")
     logger.info("==================================================")
     
-    # Target path: straight line movement at target speed
-    target_velocity = 2.0  # m/s target
-    current_time = 0.0
+    # Target linear velocity command
+    target_v = 1.5
+    target_w = 0.2  # curve motion
     
-    # True robot states for physics loop
-    true_position = 0.0
-    true_velocity = 0.0
+    # Simulated true state
+    true_x = 0.0
+    true_y = 0.0
+    true_theta = 0.0
     
-    for step in range(10):
-        # 1. Physics Step & Sensor Simulation
-        # Simulate constant acceleration to reach target
-        accel = target_velocity - true_velocity
-        # Add sensor noise
-        imu_noise = np.random.normal(0, 0.02)
-        lidar_noise = np.random.normal(0, 0.05)
+    for step in range(12):
+        # 1. Simulate actual robot physics update using kinematics
+        # Determine actual control output from PID
+        est_state = ekf_node.get_state_estimate()
+        v_est = target_v # mock tracking speed
+        w_est = target_w
         
-        simulated_imu_accel = accel + imu_noise
-        simulated_lidar_pos = true_position + true_velocity * dt + lidar_noise if step % 2 == 0 else None
-        
-        # 2. Kalman Sensor Fusion
-        state_est = fusion_node.process_step(simulated_imu_accel, simulated_lidar_pos)
-        est_pos = state_est["position"]
-        est_vel = state_est["velocity"]
-        
-        # 3. PID Control with Feedforward
-        # Calculate motor acceleration/force command based on target velocity
-        control_cmd = pid.compute(setpoint=target_velocity, measurement=est_vel, dt=dt, feedforward_input=0.5)
-        
-        # 4. Kinematics Updates
-        # Calculate wheel velocities
-        omega_l, omega_r = kinematics.inverse_kinematics(v=est_vel, omega=0.0)
-        # Update pose in map frame
+        # Calculate kinematics motor outputs
+        omega_l, omega_r = kinematics.inverse_kinematics(v=v_est, omega=w_est)
+        # Update pose in kinematics
         kinematics.forward_kinematics(omega_l, omega_r, dt)
         pose = kinematics.get_pose()
         
-        # Physics update
-        true_velocity += control_cmd * dt
-        true_position += true_velocity * dt
+        true_x = pose["x"]
+        true_y = pose["y"]
+        true_theta = pose["theta"]
         
-        # 5. Cognitive Loop Step
-        # Maps simulated states to discrete observations for Active Inference
-        if est_pos > 5.0:
-            obs_idx = 2  # CollisionImminent / danger zone
-        elif est_pos > 2.0:
-            obs_idx = 1  # ObstacleDetected / caution
+        # 2. Simulate sensor measurements with noise
+        # GPS/LiDAR absolute position measurements
+        noise_x = np.random.normal(0, 0.05)
+        noise_y = np.random.normal(0, 0.05)
+        sim_pos = (true_x + noise_x, true_y + noise_y) if step % 2 == 0 else None
+        
+        # 3. Process EKF step
+        ekf_est = ekf_node.process_step(linear_vel=v_est, angular_vel=w_est, meas_pos=sim_pos)
+        
+        # 4. Map simulated states to discrete observations for Hierarchical Active Inference
+        # High level observations: depends on steps/mission phases (simulated anomaly/battery levels)
+        if step < 4:
+            high_obs_idx = 0  # NoThreat
+        elif step < 8:
+            high_obs_idx = 1  # LiDAR_Anomaly detected
         else:
-            obs_idx = 0  # ClearPath
+            high_obs_idx = 2  # LowPower mode
             
-        # Infer state, calculate surprise (VFE), select action
-        q_belief = agent.infer_states(obs_idx)
-        vfe = agent.calculate_vfe(obs_idx)
-        action_idx, _ = agent.select_action()
+        # Low level observations: depends on proximity to a mock obstacle at (x=2.0, y=0.5)
+        dist_to_obstacle = np.sqrt((ekf_est["x"] - 2.0)**2 + (ekf_est["y"] - 0.5)**2)
+        if dist_to_obstacle < 0.5:
+            low_obs_idx = 2   # CollisionImminent
+        elif dist_to_obstacle < 1.2:
+            low_obs_idx = 1   # ObstacleDetected
+        else:
+            low_obs_idx = 0   # ClearPath
+            
+        # 5. Run Hierarchical Active Inference step
+        res = hierarchical_agent.run_step(high_obs=high_obs_idx, low_obs=low_obs_idx)
         
-        # Run Dirichlet online likelihood learning
-        agent.update_model(obs_idx)
+        h_action = res["high_action"]
+        l_action = res["low_action"]
+        h_belief = res["high_belief"]
+        l_belief = res["low_belief"]
         
-        # Log to working and episodic memory
-        working_mem.add(f"Position: {est_pos:.2f} | Action: {actions[action_idx]}", importance=0.9)
+        # Adjust target velocities based on active inference actions
+        if low_actions[l_action] == "ApplyFullStop":
+            target_v = 0.0
+            target_w = 0.0
+        elif low_actions[l_action] == "ApplyBrake":
+            target_v = 0.5
+            target_w = 0.1
+        else:
+            target_v = 1.5
+            target_w = 0.2
+            
+        # Log to memory
+        working_mem.add(f"Pose: ({ekf_est['x']:.2f}, {ekf_est['y']:.2f}) | LowAction: {low_actions[l_action]}", importance=0.85)
         episodic_mem.record_episode(
-            state=states[np.argmax(q_belief)],
-            action=actions[action_idx],
-            observation=observations[obs_idx],
-            reward=1.0 if obs_idx == 0 else (0.1 if obs_idx == 1 else -2.0)
+            state=low_states[np.argmax(l_belief)],
+            action=low_actions[l_action],
+            observation=low_observations[low_obs_idx],
+            reward=1.0 if low_obs_idx == 0 else (0.2 if low_obs_idx == 1 else -2.0)
         )
         
         logger.info(
-            f"Step {step} | Pos: {est_pos:.2f}m | Vel: {est_vel:.2f}m/s | "
-            f"Obs: {observations[obs_idx]} -> Belief: {states[np.argmax(q_belief)]} | "
-            f"Action: {actions[action_idx]} | VFE: {vfe:.4f}"
+            f"Step {step:02d} | EKF Pose: ({ekf_est['x']:.2f}, {ekf_est['y']:.2f}, {ekf_est['theta']:.2f}) | "
+            f"Goal: {high_actions[h_action]} | "
+            f"Reactive Action: {low_actions[l_action]} | Covariance Var: {[round(c, 4) for c in ekf_est['covariance']]}"
         )
-        await asyncio.sleep(0.02)
+        await asyncio.sleep(0.01)
 
     logger.info("==================================================")
     logger.info("Running Semantic Memory Consolidation Process...")
     logger.info("==================================================")
     
-    # Consolidate raw episodic sequences into generalized semantic facts
     consolidated_facts = semantic_mem.consolidate_episodes(episodic_mem)
     logger.info(f"Consolidation process complete. Stored {consolidated_facts} new facts.")
     
     # Query semantic memory to verify consolidation
-    query_res = semantic_mem.query("What action do we take under Danger or Obstacles?", top_k=2)
+    query_res = semantic_mem.query("What action do we take under obstacles or safety states?", top_k=2)
     for idx, res in enumerate(query_res):
-        logger.info(f"Consolidated Rule {idx+1}: '{res['text']}' (Similarity Score: {res['score']:.4f})")
+        logger.info(f"Consolidated Fact {idx+1}: '{res['text']}' (Similarity Score: {res['score']:.4f})")
 
     logger.info("==================================================")
     logger.info("ARAT OMEGA/AGI Integrated Simulation Completed Successfully!")

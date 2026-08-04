@@ -73,5 +73,30 @@ class TestCognition(unittest.TestCase):
         self.assertTrue(len(query_res) > 0)
         self.assertIn("leads to observation 'data_found'", query_res[0]["text"])
 
+    def test_hierarchical_active_inference_agent(self):
+        from core_cognition.reasoning_engine import HierarchicalActiveInferenceAgent
+        
+        high_params = {"num_states": 2, "num_obs": 2, "num_actions": 2, "learning_rate": 0.1}
+        low_params = {"num_states": 3, "num_obs": 3, "num_actions": 3, "learning_rate": 0.2}
+        goal_to_preference_matrix = np.array([
+            [0.8, 0.1, 0.1],
+            [0.1, 0.1, 0.8]
+        ])
+        
+        h_agent = HierarchicalActiveInferenceAgent(high_params, low_params, goal_to_preference_matrix)
+        
+        # Run one step
+        res = h_agent.run_step(high_obs=0, low_obs=1)
+        
+        self.assertIn("high_action", res)
+        self.assertIn("low_action", res)
+        self.assertEqual(len(res["high_belief"]), 2)
+        self.assertEqual(len(res["low_belief"]), 3)
+        
+        # Test C matrix changes dynamically
+        np.testing.assert_array_almost_equal(h_agent.low_agent.C, goal_to_preference_matrix[res["high_action"]], decimal=5)
+
 if __name__ == "__main__":
     unittest.main()
+
+
