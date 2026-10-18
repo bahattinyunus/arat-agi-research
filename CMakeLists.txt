@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 project(AratEdgeInference
-    VERSION 1.0.0
+    VERSION 1.1.0
     LANGUAGES CXX
 )
 
@@ -44,18 +44,15 @@ add_library(arat_edge_static STATIC ${LIBRARY_SOURCES})
 target_compile_features(arat_edge_static PRIVATE cxx_std_17)
 
 if(CMAKE_CUDA_COMPILER)
-    # CUDA target settings
     set_target_properties(arat_edge_static PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 endif()
 
-# Compile demo binary to run test allocations and inference routines
+# Standalone Edge Demonstration Binary
 add_executable(edge_demo
-    edge_inference/cpp_tensor_runtimes/tensor_runtime.cpp
-    edge_inference/memory_allocators/arena_allocator.cpp
-    edge_inference/cuda_kernels/activation_kernels.cu
+    edge_inference/edge_demo.cpp
 )
 
-target_compile_definitions(edge_demo PRIVATE STANDALONE_DEMO)
+target_link_libraries(edge_demo PRIVATE arat_edge_static)
 target_include_directories(edge_demo PRIVATE
     edge_inference/cpp_tensor_runtimes
     edge_inference/memory_allocators

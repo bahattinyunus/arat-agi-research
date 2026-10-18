@@ -7,6 +7,7 @@
 #include <chrono>
 #include <iostream>
 #include <memory>
+#include <cstdint>
 
 namespace arat {
 namespace edge {
@@ -33,6 +34,18 @@ public:
     bool setInput(const std::string& name, const std::vector<float>& data);
     bool execute();
     std::vector<float> getOutput(const std::string& name);
+
+    // Quantization routines
+    static void quantizeToInt8(const std::vector<float>& input, std::vector<int8_t>& output, float& scale);
+    static void dequantizeFromInt8(const std::vector<int8_t>& input, std::vector<float>& output, float scale);
+
+    // Matrix Multiplication GEMM: C (M x N) = A (M x K) * B (K x N)
+    static bool matmul(
+        const std::vector<float>& A,
+        const std::vector<float>& B,
+        std::vector<float>& C,
+        size_t M, size_t K, size_t N
+    );
 
     ProfilingStats getStats() const { return stats_; }
     void printProfilingSummary() const;

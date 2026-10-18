@@ -9,14 +9,12 @@ namespace edge {
 ArenaAllocator::ArenaAllocator(size_t size_bytes, size_t alignment)
     : size_(size_bytes), alignment_(alignment), offset_(0) {
     
-    // Allocate raw cache-aligned byte buffer
 #if defined(_MSC_VER)
     buffer_ = static_cast<uint8_t*>(_aligned_malloc(size_, alignment_));
     if (!buffer_) {
         throw std::bad_alloc();
     }
 #else
-    // POSIX or GCC/Clang aligned alloc
     buffer_ = static_cast<uint8_t*>(std::aligned_alloc(alignment_, size_));
     if (!buffer_) {
         throw std::bad_alloc();
@@ -63,14 +61,12 @@ ArenaAllocator& ArenaAllocator::operator=(ArenaAllocator&& other) noexcept {
 }
 
 void* ArenaAllocator::allocate(size_t size) {
-    // Calculate aligned offset
     size_t current_ptr = reinterpret_cast<size_t>(buffer_ + offset_);
     size_t align_mask = alignment_ - 1;
     size_t aligned_ptr = (current_ptr + align_mask) & ~align_mask;
     
     size_t new_offset = (aligned_ptr - reinterpret_cast<size_t>(buffer_)) + size;
 
-    // Out of memory check
     if (new_offset > size_) {
         return nullptr;
     }
@@ -81,6 +77,12 @@ void* ArenaAllocator::allocate(size_t size) {
 
 void ArenaAllocator::reset() {
     offset_ = 0;
+}
+
+void ArenaAllocator::rollback_to(size_t checkpoint) {
+    if (checkpoint <= offset_) {
+        offset_ = checkpoint;
+    }
 }
 
 } // namespace edge

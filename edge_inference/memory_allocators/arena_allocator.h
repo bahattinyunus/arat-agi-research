@@ -29,6 +29,10 @@ public:
     // Resets the offset back to 0. Deallocates all objects allocated in the arena at once.
     void reset();
 
+    // Checkpoint / watermark marker for nested temporary allocations
+    size_t get_checkpoint() const { return offset_; }
+    void rollback_to(size_t checkpoint);
+
     // Stats
     size_t total_size() const { return size_; }
     size_t used_bytes() const { return offset_; }

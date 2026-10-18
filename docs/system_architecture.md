@@ -13,33 +13,40 @@ OMEGA/AGI, yüksek seviyeli bilişsel süreçleri (Python) ile düşük seviyeli
 ```mermaid
 graph TD
     %% High-level Cognition (Python)
-    subgraph Cognition ["High-Level Cognition (Python Async)"]
-        RE[Reasoning Engine / LLM & Active Inference]
-        EM[Episodic & Semantic Memory]
-        AO[Agent Orchestrator / Message Broker]
+    subgraph Cognition ["High-Level Cognition & Epistemic Loop (Python Async)"]
+        QC[Quantum Cognition / Lindblad Dynamics & Collapse]
+        CT[Constructor Theory / Physical Task Network]
+        RE[Reasoning Engine / Hierarchical Active Inference]
+        EM[Episodic & Semantic Vector Memory]
+        AO[Agent Orchestrator / Multi-Agent Opinion Pooling]
     end
 
     %% Low-level Edge & Control (C++ / CUDA)
-    subgraph Edge ["Low-Level Edge & Control (C++/CUDA)"]
-        TR[Edge Tensor Runtime / TensorRT]
-        AA[Arena Memory Allocator]
-        CK[Custom CUDA Kernels]
+    subgraph Edge ["Low-Level Edge & Compute (C++/CUDA)"]
+        TR[Edge Tensor Runtime / INT8 Quantized & Tiled GEMM]
+        AA[Arena Memory Allocator / SIMD Aligned & Rollback]
+        CK[Custom CUDA Kernels / SwiGLU, GELU, RMSNorm, RoPE]
     end
 
-    subgraph Physical ["Physical World Integration"]
-        SF[Sensor Fusion / IMU-LiDAR Kalman]
-        KL[Kinematic Control Loop / PID]
+    %% Physical World Integration
+    subgraph Physical ["Embodied World Integration & Control"]
+        SF[Dual Sensor Fusion / Non-Linear EKF & UKF]
+        TP[Trajectory Planning / DWA Local Planner & Quintic Generator]
+        KL[Kinematic Control Loop / PID & Differential Drive]
     end
 
     %% Connections
+    QC --> RE
+    CT --> RE
     RE <--> EM
     RE <--> AO
     AO <--> TR
     TR <--> AA
     TR <--> CK
-    TR <--> SF
-    SF <--> KL
-    KL <--> RE
+    AO <--> SF
+    SF --> TP
+    TP --> KL
+    KL --> RE
 ```
 
 ---
@@ -47,26 +54,28 @@ graph TD
 ## 2. Bilişsel ve Fiziksel Veri Akış Şeması (Bilişsel Döngü)
 
 ```text
- +-------------------------------------------------------------------------------+
- |                        BİLİŞSEL DÖNGÜ (PYTHON ASYNC)                          |
- |                                                                               |
- |   [Episodic Memory] <== (Sorgu & Geri Çağırma) ==> [Reasoning Engine]         |
- |           ^                                                ||                 |
- |           || (Deneyim Kaydı)                               || (Karar / Eylem) |
- |           ||                                               \/                 |
- |   [Working Memory] <============================== [Orchestrator]             |
- +--------------------------------------------------------------------||---------+
-                                                                      || (Eylem)
-                                                                      \/
- +-------------------------------------------------------------------------------+
- |                        FİZİKSEL DÖNGÜ (C++ / CUDA)                            |
- |                                                                               |
- |   [Sensor Fusion (Kalman)] ==> (Durum Tahmini) ===> [Tensor Runtime]          |
- |             ^                                              ||                 |
- |             || (Sensör Verisi)                             || (Kontrol)       |
- |             ||                                             \/                 |
- |      [Sensör Girişleri] <========================== [Kinematic (PID)]         |
- +-------------------------------------------------------------------------------+
+ +---------------------------------------------------------------------------------------+
+ |                     YÜKSEK SEVİYELİ BİLİŞSEL DÖNGÜ (PYTHON ASYNC)                     |
+ |                                                                                       |
+ |   [Quantum Cognition] ===> (Karar Çökmesi) ===> [Hierarchical Active Inference (FEP)] |
+ |           ^                                                   ||                      |
+ |   [Constructor Theory] => (Yapılabilirlik Onayı) => [Reasoning Engine]                |
+ |                                                               ||                      |
+ |   [Episodic Memory] <=== (Deneyim Kaydı & Geri Çağırma) <==== [Orchestrator Pool]     |
+ |           ||                                                  ||                      |
+ |   [Semantic Consolidation]                                    \/                      |
+ +---------------------------------------------------------------||----------------------+
+                                                                 || (Eylem / Hedef)
+                                                                 \/
+ +---------------------------------------------------------------------------------------+
+ |                        FİZİKSEL VE UÇ HESAPLAMA DÖNGÜSÜ (C++ / CUDA)                  |
+ |                                                                                       |
+ |   [Dual Fusion: UKF & EKF] ===> (Durum Kestirimi) ===> [DWA Trajectory Planner]       |
+ |             ^                                                   ||                    |
+ |             || (Gürültülü Sensör Verisi)                        || (v, omega Komut)   |
+ |             ||                                                  \/                    |
+ |      [Sensör Girişleri] <============================= [Diferansiyel Kinematik (PID)] |
+ +---------------------------------------------------------------------------------------+
 ```
 
 ---
@@ -74,25 +83,22 @@ graph TD
 ## 3. Bileşen Rolleri ve İletişim Protokolleri
 
 ### A. Yüksek Seviyeli Bilişsel Katman (Python)
-1.  **Reasoning Engine (Bilişsel Çıkarım Motoru):** Aktif çıkarım algoritmalarını çalıştırır. LLM girdilerini kullanarak dünya modelini günceller ve Variational Free Energy hesaplamalarını yapar.
-2.  **Episodic Memory (Epizodik ve Semantik Hafıza):** Ajanın geçmiş yaşantılarını (durum-eylem dizileri) sqlite/numpy tabanlı hızlı bir vektörel veritabanında saklar.
-3.  **Agent Orchestrator (Ajan Orkestrasyonu):** Çoklu-ajan yapısında asenkron `asyncio` tabanlı Pub/Sub kanalları sağlar. Ajanların epistemik durumlarını senkronize eder.
+1.  **Quantum Cognition (Kuantum Biliş Motoru):** Karmaşık karar anlarında bilişsel hipotezleri bir Hilbert uzayında süperpozisyon halinde tutar. Çevresel gürültü altında Lindblad Master Denklemi ile açık kuantum dinamiğini çözer; duyusal gözlem anında Born kuralı ile ölçüm çökmesi sağlayarak klasik Bayesçi sınırları aşar.
+2.  **Constructor Theory (Kurucu Kuramı Görev Planlayıcısı):** David Deutsch ve Chiara Marletto'nun formülasyonu uyarınca görevleri $T = \{S_{in} \rightarrow S_{out}\}$ dönüşümleri olarak doğrular. Robotun bir eylemi gerçekleştirirken kurucu olarak stabilitesini koruyup koruyamayacağını ve termodinamik kabul edilebilirliğini kontrol eder.
+3.  **Hierarchical Active Inference (Hiyerarşik Aktif Çıkarım):** Üst seviye (hedef/bağlam) ve alt seviye (reaktif motor) olmak üzere iki katmanlı Varyasyonel Serbest Enerji minimizasyonu yürütür.
+4.  **Episodic & Semantic Memory:** Ham deneyimleri epizodik bellekte depolar; ardından state-action kümelerini istatistiksel genellemeler halinde semantik vektör uzayına konsolide eder.
+5.  **Agent Orchestration:** Çoklu-ajan yapısında doğrusal konsensüs (Linear Opinion Pool) ve log-doğrusal uzman çarpımı (Log-Linear Product of Experts) ile epistemik inançları kaynaştırır.
 
 ### B. Düşük Seviyeli Uç Çıkarım Katmanı (C++/CUDA)
-1.  **Edge Tensor Runtime:** Model ağırlıklarını ve girdi/çıktı tensörlerini yönetir. Quantized (INT8/FP16) çıkarımları milisaniyenin altında gecikmeyle yürütür.
-2.  **Arena Memory Allocator:** Gömülü işletim sistemlerinde dinamik bellek ayırma gecikmelerini (`malloc`/`new` overhead) ortadan kaldırmak için deterministik, önceden ayrılmış bellek blokları (Arena) sunar.
-3.  **CUDA Kernels:** Aktivasyon fonksiyonları (SwiGLU, GELU) gibi yoğun matris işlemlerini GPU üzerinde hızlandırır.
+1.  **Edge Tensor Runtime:** FP32, FP16 ve INT8 simetrik kuantizasyon modlarını destekler; önbellek dostu bloklu (tiled) GEMM matris çarpımı sunar.
+2.  **Arena Memory Allocator:** Önceden tahsis edilmiş SIMD hizalı (16-bayt) bellek bloklarında dinamik bellek ayırma gecikmelerini sıfırlar. Filigran (watermark checkpointing) ve O(1) geri alma (rollback) yeteneğine sahiptir.
+3.  **CUDA Kernels:** SwiGLU, GELU, RMSNorm ve RoPE (Rotary Position Embedding) işlemlerini GPU üzerinde hızlandırır; donanım bulunmadığında CPU fallback rutinlerini çalıştırır.
 
 ### C. Fiziksel Entegrasyon Katmanı (Autonomous Control)
-1.  **Sensor Fusion (Sensör Füzyonu):** IMU ve LiDAR sensörlerinden gelen yüksek frekanslı gürültülü verileri Kalman filtresi ile temizleyerek temiz durum tahminleri üretir.
-2.  **Kinematic Loops (Kinematik Kontrol):** Bilişsel katmandan veya çıkarım motorundan gelen hız/yön komutlarını PID denetleyicileri aracılığıyla motor sürücülerine (actuators) iletir.
+1.  **Dual Sensor Fusion (EKF & UKF):** 2D diferansiyel robot takibinde türeve ihtiyaç duymayan Scaled Unscented Transform tabanlı UKF ve Jacobian tabanlı EKF ile sensör verilerini birleştirir.
+2.  **Trajectory Planning (Yörünge Planlama):** Sarsıntıyı minimize eden 5. derece (quintic) polinom yörünge üreteci ve dinamik hız kısıtları altında engelleri aşan Dynamic Window Approach (DWA) yerel planlayıcısını barındırır.
+3.  **Kinematic Loops:** PID hız ve yönelim kontrol döngüleri ile motor sürücülerine doğrudan PWM/hız referansı üretir.
 
 ---
 
-## 4. Veri ve Kontrol Akışı (Epistemic-Action Loop)
-
-1.  **Algı (Perception):** `Sensor Fusion` modülü fiziksel dünyadan verileri toplar ve durumu tahmin eder.
-2.  **Bellek Geri Çağırma (Memory Retrieval):** Durum tahmini `Episodic Memory`'e gönderilir ve benzer geçmiş deneyimler çekilir.
-3.  **Karar Alma (Reasoning):** `Reasoning Engine` mevcut durum ve bellek verilerini alarak serbest enerjiyi minimize edecek optimal eylemi planlar.
-4.  **Eylem (Action):** Seçilen eylem `Kinematic Loops` üzerinden fiziksel dünyaya aktarılır.
-5.  **Öğrenme (Learning):** Eylemin sonucu (yeni gözlem) kaydedilerek bellek güncellenir.
+*© 2026 Arat Enterprise. OMEGA/AGI Architecture Specification.*

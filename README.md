@@ -6,7 +6,7 @@
 [![Python Architecture](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)](#)
 [![C++ Edge AI](https://img.shields.io/badge/C++-17%2F20-00599C?style=for-the-badge&logo=c%2B%2B)](#)
 [![CUDA / HPC](https://img.shields.io/badge/CUDA-11.8%2B-76B900?style=for-the-badge&logo=nvidia)](#)
-[![Tests Status](https://img.shields.io/badge/Tests-14%2F14%20Passed-success?style=for-the-badge&logo=github)](#)
+[![Tests Status](https://img.shields.io/badge/Tests-32%2F32%20Passed-success?style=for-the-badge&logo=github)](#)
 [![License](https://img.shields.io/badge/License-Apache_2.0-orange?style=for-the-badge)](#)
 
 > *"Yaratamadığım şeyi anlayamam."* - **Richard Feynman**
@@ -33,7 +33,7 @@ AGI araştırmalarımız, teknoloji felsefesi ile sistem mimarisi prensiplerinin
 
 ## Ⅱ. Bölüm II: Teorik ve Matematiksel Çerçeve
 
-Geliştirdiğimiz otonom bilişsel mimarilerin temelinde, ajanların çevresel belirsizliği (sürprizi) minimize etmesini hedefleyen **Serbest Enerji Prensibi (Free Energy Principle - Karl Friston)**, kuantum olasılık teorisi ve evrensel zeka denklemleri yatmaktadır.
+Geliştirdiğimiz otonom bilişsel mimarilerin temelinde, ajanların çevresel belirsizliği (sürprizi) minimize etmesini hedefleyen **Serbest Enerji Prensibi (Free Energy Principle - Karl Friston)**, kuantum olasılık teorisi, David Deutsch'un **Kurucu Kuramı (Constructor Theory)** ve non-linear durum kestirimi yatmaktadır.
 
 ### 1. Varyasyonel Serbest Enerji (Variational Free Energy)
 Ajanın (agent) çevresinden aldığı gözlemler $\mathbf{x}$ ve içsel durum temsilleri $\mathbf{z}$ olmak üzere, sistemin minimize etmeye çalıştığı varyasyonel serbest enerji şu şekilde ifade edilir:
@@ -51,40 +51,39 @@ Depomuzdaki **Hiyerarşik Aktif Çıkarım (Hierarchical Active Inference)** mim
 *   **Üst Seviye (Goal/Context Layer):** Görev hedeflerini belirler ve soyut gözlemlerle durum çıkarımı yapar. Buradan seçilen eylemler, alt seviye için duyusal inanç önceliklerini ($C$ matrisi) dinamik olarak günceller.
 *   **Alt Seviye (Reactive/Motor Layer):** Üst seviyeden gelen hedefler doğrultusunda fiziksel motor/eylem komutlarını seçer.
 
-### 3. Kuantum Biliş (Quantum Cognition) Entegrasyonu
-Zihinsel durum geçişleri ve inanç süperpozisyonları, Hilbert uzayındaki durum vektörleri $|\psi\rangle$ ile ifade edilerek klasik Bayesçi olasılıkların ötesine taşınır. Açık sistem bilişsel süreçleri, gürültülü duyusal uyaranlar altında Lindblad Master Denklemi ile simüle edilir:
+### 3. Kuantum Biliş (Quantum Cognition) & Lindblad Dinamiği
+Klasik Kolmogorov aksiyomlarının (sıra etkileri ve bağlamsallık) yetersiz kaldığı bilişsel belirsizlik anlarında zihinsel durumlar, yoğunluk matrisi $\rho$ ($Tr(\rho)=1$, $\rho=\rho^\dagger$) ile temsil edilir. Açık sistem kuantum bilişi, çevre gürültüsü altında Runge-Kutta 4 (RK4) çözücülü **Lindblad Master Denklemi** ile evrilir:
 
-$$ \frac{d\rho}{dt} = -i[H, \rho] + \sum_{k} \left( L_k \rho L_k^\dagger - \frac{1}{2} \{L_k^\dagger L_k, \rho\} \right) $$
+$$ \frac{d\rho}{dt} = -i[H, \rho] + \sum_{k} \gamma_k \left( L_k \rho L_k^\dagger - \frac{1}{2} \{L_k^\dagger L_k, \rho\} \right) $$
 
-### 4. Non-Linear Durum Tahmini (Extended Kalman Filter)
-Fiziksel dünyadaki uzantımız için geliştirilen EKF sensor fusion algoritması, robotun durumunu $\mathbf{x} = [x, y, \theta]^T$ (konum ve yön) şeklinde takip eder. Doğrusal olmayan durum geçiş modeli $f(x, u)$ ve onun Jacobian matrisi $F_j$ şu şekildedir:
+Sistemin belirsizliği **von Neumann Entropisi** ile ölçülür: $S(\rho) = -Tr(\rho \ln \rho)$. Born kuralı ile yapılan izdüşümsel ölçümler ($P(m) = Tr(M_m \rho M_m^\dagger)$), süperpozisyonu kesin bir eyleme çökertir.
 
-$$ x_{t+1} = x_t + v_t \cos(\theta_t) dt, \quad y_{t+1} = y_t + v_t \sin(\theta_t) dt, \quad \theta_{t+1} = \theta_t + \omega_t dt $$
+### 4. Kurucu Kuramı (Constructor Theory) ile Fiziksel Yapılabilirlik
+Görevler girdi-çıktı durum dönüşümleri olarak modellenir: $T = \{ S_{in} \rightarrow S_{out} \}$. Bir kurucu $C$, dönüşümü gerçekleştiren ve döngü sonunda değişmeden kalan (veya restore edilen) bir aktördür ($C \otimes S_{in} \rightarrow C \otimes S_{out}$). Termodinamik kabul edilebilirlik denetimi ($\Delta E \le W$, $\Delta S_{tot} \ge 0$), robotun imkansız eylemlere girişmesini engeller.
 
-$$ F_j = \begin{bmatrix} 1 & 0 & -v_t \sin(\theta_t) dt \\ 0 & 1 & v_t \cos(\theta_t) dt \\ 0 & 0 & 1 \end{bmatrix} $$
+### 5. Non-Linear Sensör Füzyonu (EKF & Unscented Kalman Filter - UKF)
+Robotun durum tahmini $\mathbf{x} = [x, y, \theta]^T$, analitik Jacobian gerektirmeyen **Scaled Unscented Transform** tabanlı UKF ($2n+1$ sigma noktaları) ve EKF ile çift yönlü çapraz doğrulamayla yürütülür:
+
+$$ \chi_0 = \bar{x}, \quad \chi_i = \bar{x} + \left(\sqrt{(n + \lambda) P}\right)_i, \quad \chi_{i+n} = \bar{x} - \left(\sqrt{(n + \lambda) P}\right)_i $$
+
+### 6. Dinamik Pencere Yaklaşımı (DWA) & Quintic Jerk-Minimizing Yörünge
+Engel engelleme ve kinematik kontrol, hız uzayında $V_d$ dinamik penceresini tarayan DWA algoritması ve minimum sarsıntı (jerk) sağlayan 5. derece (quintic) polinom yörünge üreteci ile optimize edilir:
+
+$$ J(v, \omega) = \alpha \cdot \text{heading}(v, \omega) + \beta \cdot \text{dist}(v, \omega) + \gamma \cdot \text{velocity}(v, \omega) $$
 
 ---
 
 ## Ⅲ. Bölüm III: Araştırma Odak Alanları
 
-Bu depo altındaki çalışmalar üç ana mühendislik ve araştırma sütunu üzerinde yükselmektedir:
-
-### 1. Bilişsel Mimari ve Çoklu-Ajan Orkestrasyonu (Cognitive Orchestration)
-Büyük dil modellerinin düşünme, hafıza yönetimi (vektörel ve epistemik hafıza) ve hareket etme yeteneklerini modüler bir düzlemde birleştiriyoruz. Tek bir monolitik model yerine, belirli görevlerde uzmanlaşmış alt ajanların `Python` tabanlı mikroservisler aracılığıyla senkronize çalıştığı bir "zihin ağı" kurguluyoruz. 
-
-### 2. Uç Yapay Zeka (Edge AI) ve Donanım Optimizasyonu
-Zeka buluta bağımlı olmamalıdır. Yüksek frekanslı karar alması gereken otonom mimariler, gecikmeyi (latency) tolere edemez. Geliştirdiğimiz CUDA/C++ altyapısında, özel **GELU** ve **SwiGLU** aktivasyon fonksiyonlarını GPU üzerinde hızlandırıyor; Arena bellek yöneticileri (Arena Memory Allocators) ile gömülü sistemlerde deterministik çalışma zamanları sağlıyoruz.
-
-### 3. Otonom Sistemler ve Robotik Kontrol Mekanizmaları
-İleri mühendislik projelerimizden, yarışma geçmişimizden ve sistem tasarımı vizyonumuzdan edindiğimiz tecrübelerle, AGI'nin fiziksel dünyadaki uzantısını yaratıyoruz. Sensör füzyonu, algı algoritmaları ve kinematik kontrol döngüleri, yapay zekanın "bedenlenmiş" (embodied AI) halini temsil eder.
+1.  **Bilişsel Mimari, Kuantum Karar Alma ve Çoklu-Ajan Orkestrasyonu:** Kuantum süperpozisyon çökmesi, doğrusal ve log-doğrusal (Product of Experts) inanç havuzu birleştirme, Dirichlet öğrenimi ve epizodik-semantik bellek konsolidasyonu.
+2.  **Uç Yapay Zeka (Edge AI) ve Donanım Optimizasyonu:** Özel CUDA çekirdekleri (**GELU, SwiGLU, RMSNorm, RoPE**), simetrik INT8 tensör kuantizasyonu, bloklu (tiled) GEMM matris çarpımı ve SIMD hizalı filigran (watermark rollback) destekli **Arena Allocator**.
+3.  **Bedenlenmiş Zeka (Embodied AI) ve Otonom Robotik:** EKF/UKF sensör füzyonu, diferansiyel sürüş ileri/ters kinematiği, PID denetleyicileri ve dinamik engelleri aşan DWA yerel yol planlayıcıları.
 
 ---
 
 ## Ⅳ. Bölüm IV: Sistem Mimarisi ve Teknoloji Yönü
 
-Yüksek performanslı hesaplama (HPC) ve çevik araştırma ortamları arasında mükemmel dengeyi kurmak için hibrit bir dil ve mimari yaklaşım benimsiyoruz:
-
-*   **Algoritma Prototipleme & Orkestrasyon:** `Python 3.10+` (PyTorch, LangChain, ROS2 entegrasyonları, Asenkron orkestrasyon)
+*   **Algoritma Prototipleme & Orkestrasyon:** `Python 3.10+` (PyTorch, NumPy, Asenkron asyncio orkestrasyon)
 *   **Düşük Gecikmeli Çıkarım & Sistem Programlama:** `C++ 17/20` (CUDA, bellek güvenliği, donanım seviyesi kontrol düğümleri, gömülü sistem entegrasyonu)
 
 ### 📂 Dizin Yapısı (Repository Topology)
@@ -93,35 +92,47 @@ Yüksek performanslı hesaplama (HPC) ve çevik araştırma ortamları arasında
 arat-agi-research/
 ├── docs/
 │   ├── ARAT_MANIFESTO.md         # Kurumsal AI ahlakı ve mühendislik prensipleri
-│   ├── epistemology_of_ai.md     # Zekanın doğası üzerine felsefi denemeler
-│   ├── system_architecture.md    # OMEGA/AGI çekirdek mimari şemaları
-│   └── quantum_cognition_and_constructor_theory.md # Kuantum biliş ve kurucu teorisi felsefesi [NEW]
+│   ├── epistemology_of_ai.md     # Zekanın doğası üzerine epistemolojik denemeler
+│   ├── system_architecture.md    # OMEGA/AGI çekirdek mimari ve veri akış şemaları
+│   └── quantum_cognition_and_constructor_theory.md # Kuantum biliş ve kurucu teorisi temelleri
 ├── core_cognition/
-│   ├── reasoning_engine/         # LLM tabanlı aktif çıkarım algoritmaları (Python)
-│   │   ├── active_inference.py   # Klasik ve Hiyerarşik Aktif Çıkarım Ajanları [MODIFIED]
-│   │   └── llm_reasoner.py       # LLM entegrasyon arayüzü
-│   ├── episodic_memory/          # Vektör veri tabanı ve bellek yönetimi
-│   └── agent_orchestration/      # Çoklu-ajan (Multi-agent) iletişim protokolleri
+│   ├── reasoning_engine/         # FEP tabanlı aktif çıkarım algoritmaları
+│   │   ├── active_inference.py   # Klasik & Hiyerarşik Aktif Çıkarım Ajanları
+│   │   └── llm_reasoner.py       # LLM entegrasyon arayüzü ve VFE sürpriz hesabı
+│   ├── episodic_memory/          # Epizodik, çalışma belleği ve semantik vektör konsolidasyonu
+│   ├── agent_orchestration/      # Çoklu-ajan Pub/Sub ve doğrusal / log-doğrusal inanç füzyonu
+│   ├── quantum_cognition/        # Kuantum Biliş & Lindblad açık sistem dinamikleri [NEW]
+│   │   ├── quantum_state.py      # Hilbert uzayı, yoğunluk matrisi (rho), von Neumann entropisi
+│   │   └── quantum_decision_agent.py # Süperpozisyon, karar çökmesi ve sıra etkileri (order effects)
+│   └── constructor_theory/       # David Deutsch Kurucu Kuramı görev ağı [NEW]
+│       └── task_network.py       # Fiziksel durumlar, termodinamik kabul edilebilirlik, görev planlayıcı
 ├── edge_inference/
-│   ├── cpp_tensor_runtimes/      # Donanıma özel optimize edilmiş çıkarım motorları (C++)
-│   ├── memory_allocators/        # Kısıtlı RAM ortamları için özel bellek yöneticileri
-│   └── cuda_kernels/             # Özel donanım hızlandırma çekirdekleri (SwiGLU, GELU) [MODIFIED]
+│   ├── cpp_tensor_runtimes/      # INT8 kuantizasyon, Tiled GEMM ve çalışma zamanı (C++)
+│   ├── memory_allocators/        # 16-bayt SIMD Arena Allocator ve filigran geri alma (rollback)
+│   ├── cuda_kernels/             # CUDA & CPU Fallback çekirdekleri (SwiGLU, GELU, RMSNorm, RoPE)
+│   └── edge_demo.cpp             # Bağımsız C++ donanım ve çıkarım doğrulama demosu [NEW]
 ├── autonomous_control/
-│   ├── sensor_fusion/            # Gerçek zamanlı veri akış işleme (Kalman, EKF)
-│   │   ├── fusion_node.py        # 1D Kalman Filtresi düğümü
-│   │   └── ekf_fusion_node.py    # 2D Extended Kalman Filtresi düğümü [NEW]
-│   └── kinematic_loops/          # Fiziksel eylem ve kontrol mekanizmaları
+│   ├── sensor_fusion/            # Gerçek zamanlı sensör füzyonu
+│   │   ├── kalman_filter.py      # Standart ve Genişletilmiş (EKF) Kalman Filtreleri
+│   │   ├── ekf_fusion_node.py    # 2D EKF robot durum kestirim düğümü
+│   │   └── unscented_kalman_filter.py # Scaled Unscented Transform UKF düğümü [NEW]
+│   ├── kinematic_loops/          # Diferansiyel kinematiği ve PID hız/açı denetleyicileri
+│   └── trajectory_planning/      # Otonom rota ve hareket planlama [NEW]
+│       ├── polynomial_planner.py # 5. derece (Quintic) jerk-minimizing yörünge üreteci
+│       └── dwa_planner.py        # Dinamik Pencere Yaklaşımı (DWA) engel sakınma planlayıcısı
 ├── tests/
-│   ├── test_cognition.py         # Bilişsel modüller testleri (Hiyerarşik test dahil) [MODIFIED]
-│   ├── test_orchestration.py     # Asenkron iletişim testleri
-│   ├── test_control.py           # Kontrol ve füzyon testleri
-│   └── test_ekf.py               # EKF non-linear tahmin testleri [NEW]
-├── assets/
-│   └── arat_agi_banner.jpg       # Depo kapak görseli
+│   ├── test_cognition.py         # Bilişsel ve aktif çıkarım testleri
+│   ├── test_orchestration.py     # Asenkron iletişim ve inanç füzyon testleri
+│   ├── test_control.py           # Kinematik ve 1D Kalman testleri
+│   ├── test_ekf.py               # 2D non-linear EKF testleri
+│   ├── test_quantum_cognition.py # Kuantum durum, entropi ve Lindblad testleri [NEW]
+│   ├── test_constructor_theory.py # Kurucu teorisi görev yapılabilirlik testleri [NEW]
+│   ├── test_ukf.py               # UKF sigma noktaları ve non-linear takip testleri [NEW]
+│   └── test_trajectory_planning.py # Polinom yörünge ve DWA engel sakınma testleri [NEW]
+├── main.py                       # OMEGA/AGI v1.2 Master simülasyon yürütme döngüsü [UPGRADED]
+├── CMakeLists.txt                # C++ / CUDA derleme betiği
 └── README.md
 ```
-
-> *"Bir sistemin kalitesi, onu oluşturan parçaların kalitesinden ziyade, bu parçaların birbiriyle nasıl etkileşime girdiğine bağlıdır."* - **Norbert Wiener** (Sibernetiğin Kurucusu)
 
 ---
 
@@ -138,10 +149,16 @@ arat-agi-research/
   * Extended Kalman Filter (EKF) ile 2D kinematik durum tahmini entegrasyonu.
   * Hiyerarşik Aktif Çıkarım (Hierarchical Active Inference) sisteminin inşası.
 
-* [ ] **Aşama 3: Bedenlenmiş Zeka (Embodied AI) ve Kuantum Karar Alma (2027 ve Ötesi)**
-  * Arat donanım altyapısı ve robotik şasiler ile entegrasyon testleri.
-  * Simülasyondan gerçeğe (Sim2Real) pekiştirmeli öğrenme transferlerinin tamamlanması.
-  * Lindblad Master Denklemi tabanlı Kuantum Biliş simülatörünün kod tabanına entegre edilmesi.
+* [x] **Aşama 3: Kuantum Karar Alma, Kurucu Teorisi ve UKF/DWA Robotik (Tamamlandı)**
+  * Lindblad Master Denklemi tabanlı Kuantum Biliş simülatörü (`QuantumDecisionAgent`) ve Born kuralı izdüşümsel ölçüm entegrasyonu.
+  * David Deutsch Kurucu Kuramı (`ConstructorTaskPlanner`) ile fiziksel yapılabilirlik ve termodinamik kısıtların entegrasyonu.
+  * Unscented Kalman Filter (`UKFSensorFusionNode`) ile türevsiz hassas non-linear durum takibi.
+  * Dynamic Window Approach (`DWA`) ve Quintic Jerk-Minimizing yörünge planlayıcılarının inşası.
+  * RMSNorm ve RoPE CUDA/CPU çekirdekleri, INT8 kuantizasyon ve Tiled GEMM eklemeleri.
+
+* [ ] **Aşama 4: Bedenlenmiş Donanım Entegrasyonu & Sim2Real (2027)**
+  * Arat fiziksel robotik şasisi üzerinde donanım seviyesi ROS2/DDS köprüsü testleri.
+  * Sim2Real pekiştirmeli transfer doğrulama döngüleri.
 
 ---
 
