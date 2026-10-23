@@ -4,11 +4,15 @@ from . import episodic_memory
 from . import agent_orchestration
 from . import quantum_cognition
 from . import constructor_theory
+from . import neuromorphic
+from . import world_model
 
 __all__ = [
     "reasoning_engine",
     "episodic_memory",
     "agent_orchestration",
     "quantum_cognition",
-    "constructor_theory"
+    "constructor_theory",
+    "neuromorphic",
+    "world_model"
 ]

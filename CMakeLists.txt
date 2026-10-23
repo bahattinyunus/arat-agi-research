@@ -28,6 +28,8 @@ set(LIBRARY_SOURCES
     edge_inference/cpp_tensor_runtimes/tensor_runtime.cpp
     edge_inference/memory_allocators/arena_allocator.cpp
     edge_inference/cuda_kernels/activation_kernels.cu
+    edge_inference/cuda_kernels/flash_attention.cu
+    edge_inference/kv_cache/kv_cache_manager.cpp
 )
 
 # Include paths
@@ -35,6 +37,7 @@ include_directories(
     edge_inference/cpp_tensor_runtimes
     edge_inference/memory_allocators
     edge_inference/cuda_kernels
+    edge_inference/kv_cache
 )
 
 # Edge Shared/Static Library Target
@@ -57,4 +60,5 @@ target_include_directories(edge_demo PRIVATE
     edge_inference/cpp_tensor_runtimes
     edge_inference/memory_allocators
     edge_inference/cuda_kernels
+    edge_inference/kv_cache
 )

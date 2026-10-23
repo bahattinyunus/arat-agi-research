@@ -3,6 +3,8 @@
 #include "tensor_runtime.h"
 #include "arena_allocator.h"
 #include "activation_kernels.h"
+#include "flash_attention.h"
+#include "kv_cache_manager.h"
 
 int main() {
     std::cout << "==================================================" << std::endl;
@@ -78,15 +80,24 @@ int main() {
         std::cout << "]" << std::endl;
     }
 
-    // 5. Test RMSNorm & SwiGLU Kernel CPU Fallbacks
-    std::cout << "\n[4] Testing RMSNorm and RoPE Mathematical Execution..." << std::endl;
-    std::vector<float> hidden_states = {1.0f, 2.0f, 3.0f, 4.0f};
-    std::vector<float> gamma = {1.0f, 1.0f, 1.0f, 1.0f};
-    std::vector<float> norm_out(4, 0.0f);
-    arat::edge::cuda::rmsnorm_cpu_fallback(hidden_states.data(), gamma.data(), norm_out.data(), 1, 4);
-    std::cout << "RMSNorm Output: [ ";
-    for (float v : norm_out) std::cout << v << " ";
+    // 5. Test FlashAttention Tiling
+    std::cout << "\n[4] Testing FlashAttention Tiled Online Softmax..." << std::endl;
+    std::vector<float> Q = {1.0f, 0.0f, 0.0f, 1.0f}; // 1 batch, 1 head, 2 seq, 2 dim
+    std::vector<float> K = {1.0f, 0.0f, 0.0f, 1.0f};
+    std::vector<float> V = {2.0f, 3.0f, 4.0f, 5.0f};
+    std::vector<float> AttnOut(4, 0.0f);
+    arat::edge::cuda::flash_attention_cpu(Q.data(), K.data(), V.data(), AttnOut.data(), 1, 1, 2, 2);
+    std::cout << "FlashAttention Output: [ ";
+    for (float v : AttnOut) std::cout << v << " ";
     std::cout << "]" << std::endl;
+
+    // 6. Test Paged KV Cache Manager
+    std::cout << "\n[5] Testing Paged KV-Cache Manager..." << std::endl;
+    arat::edge::PagedKVCacheManager kv_mgr(16, 4, 1, 2); // 16 blocks, 4 tokens/block
+    kv_mgr.allocateBlock(101);
+    kv_mgr.appendToken(101, {0.1f, 0.2f}, {0.3f, 0.4f});
+    std::cout << "Allocated sequence 101. Total tokens cached: " << kv_mgr.getSequenceLength(101) << std::endl;
+    std::cout << "Remaining free cache blocks: " << kv_mgr.getFreeBlockCount() << std::endl;
 
     std::cout << "\n==================================================" << std::endl;
     std::cout << "  ARAT Edge Engine Verification Complete!" << std::endl;
