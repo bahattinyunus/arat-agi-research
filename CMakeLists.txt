@@ -29,6 +29,7 @@ set(LIBRARY_SOURCES
     edge_inference/memory_allocators/arena_allocator.cpp
     edge_inference/cuda_kernels/activation_kernels.cu
     edge_inference/cuda_kernels/flash_attention.cu
+    edge_inference/cuda_kernels/gemv_int4.cu
     edge_inference/kv_cache/kv_cache_manager.cpp
 )
 

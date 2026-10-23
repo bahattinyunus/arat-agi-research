@@ -6,7 +6,7 @@
 [![Python Architecture](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)](#)
 [![C++ Edge AI](https://img.shields.io/badge/C++-17%2F20-00599C?style=for-the-badge&logo=c%2B%2B)](#)
 [![CUDA / HPC](https://img.shields.io/badge/CUDA-11.8%2B-76B900?style=for-the-badge&logo=nvidia)](#)
-[![Tests Status](https://img.shields.io/badge/Tests-43%2F43%20Passed-success?style=for-the-badge&logo=github)](#)
+[![Tests Status](https://img.shields.io/badge/Tests-53%2F53%20Passed-success?style=for-the-badge&logo=github)](#)
 [![License](https://img.shields.io/badge/License-Apache_2.0-orange?style=for-the-badge)](#)
 
 > *"Yaratamadığım şeyi anlayamam."* - **Richard Feynman**
@@ -15,7 +15,7 @@
 >
 > *"Gözlemlediğimiz şey doğanın kendisi değil, doğanın bizim soru sorma yöntemimize maruz kalmış halidir."* - **Werner Heisenberg** (Physics and Philosophy)
 
-**Arat AGI Research**, Arat ekosisteminin Yapay Genel Zeka (AGI), otonom bilişsel mimariler, uç sistemler (Edge AI), nöromorfik hesaplama ve bedenlenmiş robotik sistemler (Embodied AI) üzerine yürüttüğü resmi, çok disiplinli araştırma manifestosudur.
+**Arat AGI Research**, Arat ekosisteminin Yapay Genel Zeka (AGI), otonom bilişsel mimariler, uç sistemler (Edge AI), nöromorfik hesaplama, nedensel çıkarım (Causal Reasoning) ve bedenlenmiş robotik sistemler (Embodied AI) üzerine yürüttüğü resmi, çok disiplinli araştırma manifestosudur.
 
 ---
 
@@ -31,47 +31,48 @@ AGI araştırmalarımız, teknoloji felsefesi ile sistem mimarisi prensiplerinin
 
 ## Ⅱ. Bölüm II: Teorik ve Matematiksel Çerçeve
 
-Geliştirdiğimiz bilişsel mimariler serbest enerji prensibi, kuantum olasılık teorisi, kurucu kuramı, biyolojik nöromorfik dinamikler ve self-supervised dünya modellerinin kesişiminde yer alır.
-
 ### 1. Varyasyonel ve Beklenen Serbest Enerji (Free Energy Principle - Karl Friston)
-Ajanın çevresel belirsizliği minimize etme döngüsü:
-
 $$ F = D_{KL}(q(\mathbf{z}) \parallel p(\mathbf{z})) - \mathbb{E}_{q(\mathbf{z})}[\log p(\mathbf{x} \mid \mathbf{z})] $$
 
 $$ G(\pi) \approx \underbrace{D_{KL}(q(\mathbf{x}_{\tau} \mid \pi) \parallel p(\mathbf{x}_{\tau}))}_{\text{Pragmatik Fayda}} + \underbrace{\mathbb{E}_{q(\mathbf{z}_{\tau} \mid \pi)} [H(q(\mathbf{x}_{\tau} \mid \mathbf{z}_{\tau}, \pi))]}_{\text{Epistemik Merak}} $$
 
 ### 2. Kuantum Biliş (Quantum Cognition) & Lindblad Dinamiği
-Bağlamsallık ve sıra etkilerini yönetmek için açık sistem kuantum dinamiği Runge-Kutta 4 (RK4) ile çözülür:
+Açık sistem kuantum dinamiği Runge-Kutta 4 (RK4) ile çözülür:
 
 $$ \frac{d\rho}{dt} = -i[H, \rho] + \sum_{k} \gamma_k \left( L_k \rho L_k^\dagger - \frac{1}{2} \{L_k^\dagger L_k, \rho\} \right) $$
 
-Sistem belirsizliği von Neumann Entropisi ile izlenir ($S(\rho) = -\text{Tr}(\rho \ln \rho)$) ve Born kuralı ile eyleme çöker ($P(m) = \text{Tr}(M_m \rho M_m^\dagger)$).
+Sistem belirsizliği von Neumann Entropisi ile izlenir ($S(\rho) = -\text{Tr}(\rho \ln \rho)$) ve Born kuralı ile ölçüm çökmesi gerçekleşir ($P(m) = \text{Tr}(M_m \rho M_m^\dagger)$).
 
 ### 3. Kurucu Kuramı (Constructor Theory)
-Dönüşümler $T = \{S_{in} \rightarrow S_{out}\}$ olarak doğrulanır. Kurucu $C$, eylem sonrasında değişmeden kalan veya kendini onaran fiziksel yapıdır ($C \otimes S_{in} \rightarrow C \otimes S_{out}$). Termodinamik kısıtlar ($\Delta E \le W$, $\Delta S_{tot} \ge 0$) eylemden önce denetlenir.
+Dönüşümler $T = \{S_{in} \rightarrow S_{out}\}$ olarak doğrulanır. Kurucu $C$, eylem sonrasında değişmeden kalan fiziksel yapıdır ($C \otimes S_{in} \rightarrow C \otimes S_{out}$). Termodinamik kısıtlar ($\Delta E \le W$, $\Delta S_{tot} \ge 0$) eylemden önce denetlenir.
 
-### 4. Nöromorfik Biliş & Spiking Neural Networks (LIF + STDP)
-Olay-tabanlı (event-driven) mikro-watt algılama Leaky Integrate-and-Fire diferansiyel denklemi ve Spike-Timing-Dependent Plasticity (STDP) ile yürütülür:
+### 4. Judea Pearl Nedensel Hiyerarşisi & Yapısal Nedensellik Modelleri (SCM)
+Salt korelasyondan bağımsız, müdahaleci ve karşı-olgusal akıl yürütme:
+1. **İlişkisel (Association):** $P(Y \mid X)$
+2. **Müdahaleci (Intervention / Do-Calculus):** $P(Y \mid \text{do}(X = x))$ (Grafik cerrahisi / Mutilation)
+3. **Karşı-Olgusal (Counterfactuals):** Pearl'ün 3-adımlı algoritması:
+   * **Kaçırma (Abduction):** Gözlenen $E = e$ verisinden dışsal gürültü $U$ çıkarımı.
+   * **Eylem (Action):** Denklemlerde $\text{do}(X = x')$ müdahalesinin uygulanması.
+   * **Tahmin (Prediction):** Güncellenmiş yapısal denklem ve $U$ ile $Y$'nin hesaplanması.
+* **d-Separation Kriteri:** $X$ ve $Y$ arasındaki yolların bloklanması (Chain, Fork ve Collider analizi).
 
-$$ \tau_m \frac{dV}{dt} = -(V - V_{rest}) + R \cdot I_{syn} $$
+### 5. Model Predictive Path Integral (MPPI) Kontrol
+Stokastik optimal kontrol ve engel sakınma:
 
-$$ \Delta w = \begin{cases} A_+ \exp\left(-\frac{\Delta t}{\tau_+}\right) & \Delta t > 0 \quad (\text{LTP}) \\ -A_- \exp\left(\frac{\Delta t}{\tau_-}\right) & \Delta t < 0 \quad (\text{LTD}) \end{cases} $$
+$$ u_t^* = u_t + \sum_{k=1}^K w_k \cdot \epsilon_t^{(k)}, \quad w_k = \frac{\exp(-\frac{1}{\lambda} (S(\tau^{(k)}) - \min_j S(\tau^{(j)})))}{\sum_m \exp(-\frac{1}{\lambda} (S(\tau^{(m)}) - \min_j S(\tau^{(j)})))} $$
 
-### 5. Self-Supervised RSSM Dünya Modeli & Epistemik Merak
-Deterministik $h_t$ ve stokastik $z_t$ gizli durum uzayında ortam dinamiği modellenir:
+### 6. Faktör Grafiği SLAM & Gauss-Newton Döngü Kapatma (Loop Closure)
+Odom kaymasını sıfırlayan non-linear en küçük kareler optimizasyonu:
 
+$$ F(X) = \sum_{ij} e_{ij}(X)^T \Omega_{ij} e_{ij}(X), \quad (J^T \Omega J) \Delta X = -J^T \Omega e $$
+
+### 7. Nöromorfik Biliş & SNN Dinamiği (LIF + STDP)
+Olay-tabanlı mikro-watt algılama:
+
+$$ \tau_m \frac{dV}{dt} = -(V - V_{rest}) + R \cdot I_{syn}, \quad \Delta w = \begin{cases} A_+ \exp(-\Delta t / \tau_+) & \Delta t > 0 \\ -A_- \exp(\Delta t / \tau_-) & \Delta t < 0 \end{cases} $$
+
+### 8. Self-Supervised RSSM Dünya Modeli
 $$ h_t = f(h_{t-1}, z_{t-1}, a_{t-1}), \quad p(z_t \mid h_t) \sim \mathcal{N}(\mu_{prior}, \sigma_{prior}), \quad q(z_t \mid h_t, x_t) \sim \mathcal{N}(\mu_{post}, \sigma_{post}) $$
-
-$$ R_{\text{intrinsic}} = \beta_{KL} D_{KL}(q(z_t \mid h_t, x_t) \parallel p(z_t \mid h_t)) + \beta_{\text{recon}} \|x_t - \hat{x}_t\|^2 $$
-
-### 6. Non-Linear Füzyon (UKF) & Dinamik Yörünge (DWA)
-Scaled Unscented Transform ile türevsiz durum takibi ($2n+1$ sigma noktası):
-
-$$ \chi_0 = \bar{x}, \quad \chi_i = \bar{x} + \left(\sqrt{(n + \lambda) P}\right)_i, \quad \chi_{i+n} = \bar{x} - \left(\sqrt{(n + \lambda) P}\right)_i $$
-
-Ve Dynamic Window Approach ile engel sakınma:
-
-$$ J(v, \omega) = \alpha \cdot \text{heading}(v, \omega) + \beta \cdot \text{dist}(v, \omega) + \gamma \cdot \text{velocity}(v, \omega) $$
 
 ---
 
@@ -82,7 +83,7 @@ arat-agi-research/
 ├── docs/
 │   ├── ARAT_MANIFESTO.md         # Kurumsal AI ahlakı ve mühendislik prensipleri
 │   ├── epistemology_of_ai.md     # Zekanın epistemolojisi ve Markov Blanket
-│   ├── system_architecture.md    # OMEGA/AGI v2.0 sistem mimari şemaları
+│   ├── system_architecture.md    # OMEGA/AGI v2.5 sistem mimari şemaları
 │   └── quantum_cognition_and_constructor_theory.md # Kuantum biliş & kurucu teorisi
 ├── core_cognition/
 │   ├── reasoning_engine/         # FEP tabanlı aktif çıkarım algoritmaları
@@ -90,19 +91,22 @@ arat-agi-research/
 │   ├── agent_orchestration/      # Çoklu-ajan Pub/Sub & inanç füzyonu (Linear / Log-Linear)
 │   ├── quantum_cognition/        # Kuantum Biliş & Lindblad RK4 dinamikleri
 │   ├── constructor_theory/       # David Deutsch Kurucu Kuramı görev ağı
-│   ├── neuromorphic/             # SNN, LIF, Izhikevich & STDP sinaps motoru [NEW]
-│   └── world_model/              # RSSM Dünya Modeli & Epistemik Merak Motoru [NEW]
+│   ├── neuromorphic/             # SNN, LIF, Izhikevich & STDP sinaps motoru
+│   ├── world_model/              # RSSM Dünya Modeli & Epistemik Merak Motoru
+│   └── causal_reasoning/         # Pearl Causal DAG, SCM, Do-Calculus & Karşı-Olgusal [NEW]
 ├── edge_inference/
 │   ├── cpp_tensor_runtimes/      # INT8 kuantizasyon, Tiled GEMM ve çalışma zamanı
 │   ├── memory_allocators/        # SIMD Arena Allocator ve filigran (rollback)
-│   ├── cuda_kernels/             # SwiGLU, GELU, RMSNorm, RoPE ve FlashAttention-2 [MODIFIED]
-│   ├── kv_cache/                 # Paged KV-Cache yöneticisi ve INT8 bloklama [NEW]
-│   └── edge_demo.cpp             # Bağımsız C++ donanım ve çıkarım doğrulama demosu
+│   ├── cuda_kernels/             # SwiGLU, GELU, RMSNorm, RoPE, FlashAttention-2 ve INT4 GEMV [MODIFIED]
+│   ├── kv_cache/                 # Paged KV-Cache yöneticisi ve INT8 bloklama
+│   └── edge_demo.cpp             # Bağımsız C++ donanım ve çıkarım doğrulama demosu [UPDATED]
 ├── autonomous_control/
 │   ├── sensor_fusion/            # Kalman, 2D EKF ve Scaled Unscented Transform (UKF)
 │   ├── kinematic_loops/          # Diferansiyel kinematiği ve PID hız/açı denetleyicileri
 │   ├── trajectory_planning/      # Quintic jerk-minimizing yörünge & DWA yerel planlayıcı
-│   └── embodied_bridge/          # ROS2/DDS köprüsü, QoS ve Sim2Real domain randomizer [NEW]
+│   ├── embodied_bridge/          # ROS2/DDS köprüsü, QoS ve Sim2Real domain randomizer
+│   ├── mppi_control/             # Model Predictive Path Integral (MPPI) stokastik kontrol [NEW]
+│   └── slam_backend/             # Faktör grafiği pose graph SLAM & Gauss-Newton döngü kapatma [NEW]
 ├── tests/
 │   ├── test_cognition.py         # Aktif çıkarım testleri
 │   ├── test_orchestration.py     # Asenkron iletişim testleri
@@ -112,11 +116,14 @@ arat-agi-research/
 │   ├── test_constructor_theory.py # Kurucu teorisi testleri
 │   ├── test_ukf.py               # UKF sigma noktaları testleri
 │   ├── test_trajectory_planning.py # DWA engel sakınma testleri
-│   ├── test_neuromorphic.py      # LIF, Poisson encoder, STDP sinaps testleri [NEW]
-│   ├── test_world_model.py       # RSSM, hayal gücü rollout ve merak testleri [NEW]
-│   └── test_embodied_bridge.py   # ROS2 mesaj, DDS deadman ve Sim2Real testleri [NEW]
-├── main.py                       # OMEGA/AGI v2.0 Master Birleşik Simülasyon Döngüsü [UPGRADED]
-├── CMakeLists.txt                # C++ / CUDA derleme betiği
+│   ├── test_neuromorphic.py      # LIF, Poisson encoder, STDP sinaps testleri
+│   ├── test_world_model.py       # RSSM, hayal gücü rollout ve merak testleri
+│   ├── test_embodied_bridge.py   # ROS2 mesaj, DDS deadman ve Sim2Real testleri
+│   ├── test_causal_reasoning.py  # Causal DAG, d-separation, SCM counterfactual testleri [NEW]
+│   ├── test_mppi.py              # MPPI paralel rollout ve stokastik optimizasyon testleri [NEW]
+│   └── test_slam_backend.py      # Pose graph Jacobian ve Gauss-Newton optimizasyon testleri [NEW]
+├── main.py                       # OMEGA/AGI v2.5 Master Birleşik Simülasyon Döngüsü [UPGRADED]
+├── CMakeLists.txt                # C++ / CUDA derleme betiği [UPDATED]
 └── README.md
 ```
 
@@ -128,7 +135,8 @@ arat-agi-research/
 * [x] **Aşama 2: Edge Optimizasyonu ve EKF Entegrasyonu (Q4 2026)**
 * [x] **Aşama 3: Kuantum Karar Alma, Kurucu Teorisi ve UKF/DWA Robotik (Tamamlandı)**
 * [x] **Aşama 4: Nöromorfik SNN, RSSM Dünya Modeli, FlashAttention ve ROS2 Sim2Real (Tamamlandı)**
-* [ ] **Aşama 5: Fiziksel Donanım Bedenlenmesi & Canlı Saha Konuşlandırması (2027)**
+* [x] **Aşama 5: Nedensel Akıl Yürütme (Causal SCM), MPPI Kontrol ve Faktör Grafiği SLAM (Tamamlandı)**
+* [ ] **Aşama 6: Fiziksel Donanım Bedenlenmesi & Canlı Saha Konuşlandırması (2027)**
 
 ---
 

@@ -6,6 +6,7 @@ from . import quantum_cognition
 from . import constructor_theory
 from . import neuromorphic
 from . import world_model
+from . import causal_reasoning
 
 __all__ = [
     "reasoning_engine",
@@ -14,5 +15,6 @@ __all__ = [
     "quantum_cognition",
     "constructor_theory",
     "neuromorphic",
-    "world_model"
+    "world_model",
+    "causal_reasoning"
 ]

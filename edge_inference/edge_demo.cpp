@@ -5,6 +5,7 @@
 #include "activation_kernels.h"
 #include "flash_attention.h"
 #include "kv_cache_manager.h"
+#include "gemv_int4.h"
 
 int main() {
     std::cout << "==================================================" << std::endl;
@@ -98,6 +99,22 @@ int main() {
     kv_mgr.appendToken(101, {0.1f, 0.2f}, {0.3f, 0.4f});
     std::cout << "Allocated sequence 101. Total tokens cached: " << kv_mgr.getSequenceLength(101) << std::endl;
     std::cout << "Remaining free cache blocks: " << kv_mgr.getFreeBlockCount() << std::endl;
+
+    // 7. Test INT4 AWQ Bit-Packing & GEMV
+    std::cout << "\n[6] Testing 4-Bit Weight-Only AWQ GEMV (8 weights/uint32)..." << std::endl;
+    std::vector<float> W_raw = {
+        0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f,
+        -0.8f, -0.6f, -0.4f, -0.2f, 0.0f, 0.2f, 0.4f, 0.6f
+    }; // M=2, K=8
+    std::vector<uint32_t> W_packed;
+    std::vector<float> scales, zeros;
+    arat::edge::cuda::pack_weights_int4(W_raw, W_packed, scales, zeros, 2, 8);
+    std::cout << "Packed 16 floats into " << W_packed.size() << " uint32_t words (75% compression)." << std::endl;
+
+    std::vector<float> x_act = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+    std::vector<float> y_out(2, 0.0f);
+    arat::edge::cuda::gemv_int4_cpu(W_packed.data(), scales.data(), zeros.data(), x_act.data(), y_out.data(), 2, 8);
+    std::cout << "GEMV INT4 Output: [ " << y_out[0] << ", " << y_out[1] << " ]" << std::endl;
 
     std::cout << "\n==================================================" << std::endl;
     std::cout << "  ARAT Edge Engine Verification Complete!" << std::endl;

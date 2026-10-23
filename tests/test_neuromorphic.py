@@ -33,15 +33,16 @@ def test_izhikevich_neuron():
     assert sum(spikes) > 0 # Must generate spikes
 
 def test_poisson_spike_encoder():
+    np.random.seed(42)
     encoder = PoissonSpikeEncoder(max_freq_hz=100.0, dt_ms=1.0)
     inputs = np.array([0.0, 0.5, 1.0])
-    trains = encoder.encode(inputs, duration_steps=100)
+    trains = encoder.encode(inputs, duration_steps=300)
 
-    assert trains.shape == (3, 100)
-    # Zero input should produce near zero spikes
+    assert trains.shape == (3, 300)
+    # Zero input should produce zero spikes
     assert np.sum(trains[0]) == 0
     # High input should produce more spikes than medium input
-    assert np.sum(trains[2]) >= np.sum(trains[1])
+    assert np.sum(trains[2]) > np.sum(trains[1])
 
 def test_stdp_synapse_plasticity():
     synapse = STDPSynapse(num_pre=2, num_post=2, a_plus=0.05, a_minus=0.04)
